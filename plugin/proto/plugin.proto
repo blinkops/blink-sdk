@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package plugin;
+
+option go_package = "github.com/blinkops/stackstorm-description/proto";
+
+service Plugin {
+  rpc Describe(Empty) returns (PluginDescription) {}
+
+  rpc GetActions(Empty) returns (ActionList) {}
+  rpc ExecuteAction(ExecuteActionRequest) returns (ExecuteActionResponse) {}
+}
+
+message Empty {}
+
+message PluginDescription {
+    string name = 1;
+    string description = 2;
+    repeated string tags = 3;
+    string provider = 4;
+}
+
+message ActionParameter {
+  string name = 1;
+  string type = 2;
+  string description = 3;
+  bool required = 4;
+}
+
+message Action {
+    string name = 1;
+    string description = 2;
+    string enabled = 3;
+    repeated ActionParameter parameters = 4;
+}
+
+message ActionList {
+  repeated Action actions = 1;
+}
+
+message ExecuteActionRequest {
+  string name = 1;
+  map<string, string> parameters = 2;
+}
+
+message ExecuteActionResponse {
+  int64 error_code = 1;
+  bytes result = 2;
+}
