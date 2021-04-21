@@ -1,1 +1,10 @@
 Plugin SDK!
+
+In order to integrate the SDK into your project:
+
+```
+    export GOPRIVATE="github.com/blinkops"
+    git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+    go get github.com/blinkops/plugin-sdk
+```
+
