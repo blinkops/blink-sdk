@@ -14,11 +14,13 @@ type PluginGRPCService struct {
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
 	pluginDescription := service.plugin.Describe()
+	actions, _ := service.GetActions(ctx, empty)
 
 	return &pb.PluginDescription{
 		Name:        pluginDescription.Name,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
+		Actions: actions,
 	}, nil
 }
 
