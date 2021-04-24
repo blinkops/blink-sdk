@@ -44,7 +44,7 @@ message Field {
 message Action {
     string name = 1;
     string description = 2;
-    string enabled = 3;
+    bool active = 3;
     repeated ActionParameter parameters = 4;
     Output output = 5;
 }
