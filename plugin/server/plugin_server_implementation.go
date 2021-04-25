@@ -68,7 +68,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 	return &pb.ActionList{Actions: protoActions}, nil
 }
 
-func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
 
 	actionRequest := plugin.ExecuteActionRequest{
 		Name:       request.Name,
@@ -80,10 +80,17 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 		return nil, err
 	}
 
-	return &pb.ExecuteActionResponse{
+	res := &pb.ExecuteActionResponse{
 		ErrorCode: response.ErrorCode,
 		Result:    response.Result,
-	}, nil
+	}
+
+	for _, row := range response.Rows {
+		pbRow := &pb.Row{Data: row}
+		res.Rows = append(res.Rows, pbRow)
+	}
+
+	return res, nil
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {

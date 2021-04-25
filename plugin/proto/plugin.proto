@@ -57,4 +57,9 @@ message ExecuteActionRequest {
 message ExecuteActionResponse {
   int64 error_code = 1;
   bytes result = 2;
+  repeated Row rows = 3;
+}
+
+message Row {
+   map<string, string> data = 1;
 }
