@@ -17,7 +17,7 @@ message PluginDescription {
     string description = 2;
     repeated string tags = 3;
     string provider = 4;
-    ActionList actions = 5;
+    repeated Action actions = 5;
 }
 
 message ActionParameter {
@@ -29,11 +29,7 @@ message ActionParameter {
 
 message Output {
     string table = 1;
-    FieldList fields = 2;
-}
-
-message FieldList {
-    repeated Field field = 1;
+    repeated Field fields = 2;
 }
 
 message Field {
