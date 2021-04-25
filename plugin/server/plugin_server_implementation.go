@@ -20,7 +20,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Name:        pluginDescription.Name,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
-		Actions: actions,
+		Actions:  	 actions.Actions,
 	}, nil
 }
 
@@ -34,7 +34,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 		protoAction := &pb.Action{
 			Name:        action.Name,
 			Description: action.Description,
-			Enabled:     action.Enabled,
+			Active:     action.Enabled,
 		}
 
 		var protoParameters []*pb.ActionParameter

@@ -9,7 +9,7 @@ type ActionParameter struct {
 type Action struct {
 	Name        string                     `yaml:"name"`
 	Description string                     `yaml:"description"`
-	Enabled     string                     `yaml:"enabled"`
+	Enabled     bool                       `yaml:"enabled"`
 	EntryPoint  string                     `yaml:"entry_point"`
 	Parameters  map[string]ActionParameter `yaml:"parameters"`
 }
