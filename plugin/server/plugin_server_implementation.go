@@ -48,6 +48,19 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 
 			protoParameters = append(protoParameters, protoParameter)
 		}
+		protoAction.Parameters = protoParameters
+		if action.Output != nil {
+			protoAction.Output = &pb.Output{
+				Table: action.Output.Name,
+			}
+			for _, field := range action.Output.Fields {
+				protoField := &pb.Field{
+					Name: field.Name,
+					Type: field.Type,
+				}
+				protoAction.Output.Fields = append(protoAction.Output.Fields, protoField)
+			}
+		}
 
 		protoActions = append(protoActions, protoAction)
 	}

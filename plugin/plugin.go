@@ -12,6 +12,17 @@ type Action struct {
 	Enabled     bool                       `yaml:"enabled"`
 	EntryPoint  string                     `yaml:"entry_point"`
 	Parameters  map[string]ActionParameter `yaml:"parameters"`
+	Output		*Output
+}
+
+type Field struct {
+	Name 	string
+	Type 	string
+}
+
+type Output struct {
+	Name 		string
+	Fields      []Field
 }
 
 type Description struct {
