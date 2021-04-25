@@ -4,7 +4,7 @@ import (
 	"github.com/blinkops/plugin-sdk/plugin"
 	"github.com/blinkops/plugin-sdk/plugin/config"
 	"github.com/blinkops/plugin-sdk/plugin/server"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
 
@@ -17,9 +17,10 @@ const (
 
 func registerNetworkListener() (*net.Listener, error) {
 	listenConfiguration := ":" + config.GetConfig().Server.Port
+	log.Infof("Starting grpc listener on port %s\n", listenConfiguration)
 	listener, err := net.Listen(ListenMode, listenConfiguration)
 	if err != nil {
-		logrus.Error("Failed to register network listener: ", err)
+		log.Error("Failed to register network listener: ", err)
 		return nil, err
 	}
 
@@ -27,11 +28,11 @@ func registerNetworkListener() (*net.Listener, error) {
 }
 
 func Start(pluginImplementation plugin.Implementation) error {
-
-	logrus.Infoln("Starting description server.")
+	description := pluginImplementation.Describe()
+	log.Infof("Starting %s server.\n", description.Name)
 	grpcServer := grpc.NewServer()
 
-	logrus.Infoln("Registering description service!")
+	log.Infof("Registering %s service!\n", description.Name)
 	pluginServiceImplementation := server.NewPluginServiceImplementation(pluginImplementation)
 	pb.RegisterPluginServer(grpcServer, pluginServiceImplementation)
 
@@ -40,6 +41,6 @@ func Start(pluginImplementation plugin.Implementation) error {
 		return err
 	}
 
-	logrus.Infoln("Server is starting to serve requests...")
+	log.Infoln("Server is starting to serve requests...")
 	return grpcServer.Serve(*networkListener)
 }
