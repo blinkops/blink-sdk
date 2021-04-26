@@ -14,13 +14,16 @@ type PluginGRPCService struct {
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
 	pluginDescription := service.plugin.Describe()
-	actions, _ := service.GetActions(ctx, empty)
+	actions, err := service.GetActions(ctx, empty)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb.PluginDescription{
 		Name:        pluginDescription.Name,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
-		Actions:  	 actions.Actions,
+		Actions: actions.Actions,
 	}, nil
 }
 
@@ -34,7 +37,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 		protoAction := &pb.Action{
 			Name:        action.Name,
 			Description: action.Description,
-			Active:     action.Enabled,
+			Active:      action.Enabled,
 		}
 
 		var protoParameters []*pb.ActionParameter
