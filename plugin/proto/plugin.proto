@@ -17,7 +17,8 @@ message PluginDescription {
     string description = 2;
     repeated string tags = 3;
     string provider = 4;
-    repeated Action actions = 5;
+    string image = 5;
+    repeated Action actions = 6;
 }
 
 message ActionParameter {
