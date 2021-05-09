@@ -54,6 +54,10 @@ func (ctx *ActionContext) GetMarshaledContext() ([]byte, error) {
 	return json.Marshal(ctx.internalContext)
 }
 
+func (ctx *ActionContext) GetAllContextEntries() map[string]interface{} {
+	return ctx.internalContext
+}
+
 func (ctx *ActionContext) GetRawLogBuffer() []byte {
 	return ctx.logBuffer.Bytes()
 }
