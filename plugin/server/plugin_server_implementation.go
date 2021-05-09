@@ -81,10 +81,12 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 	}
 
 	rawContext := map[string]interface{}{}
-	err := json.Unmarshal(request.Context, &rawContext)
-	if err != nil {
-		log.Error("Failed to unmarshal action context with error: ", err)
-		return nil, err
+	if len(request.Context) > 0 {
+		err := json.Unmarshal(request.Context, &rawContext)
+		if err != nil {
+			log.Error("Failed to unmarshal action context with error: ", err)
+			return nil, err
+		}
 	}
 
 	actionContext := plugin.NewActionContext(rawContext)
