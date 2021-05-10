@@ -13,11 +13,12 @@ service Plugin {
 message Empty {}
 
 message PluginDescription {
-    string name = 1;
-    string description = 2;
-    repeated string tags = 3;
-    string provider = 4;
-    repeated Action actions = 5;
+  string name = 1;
+  string description = 2;
+  repeated string tags = 3;
+  string provider = 4;
+  repeated Action actions = 5;
+  string image = 6;
 }
 
 message ActionParameter {
@@ -28,21 +29,21 @@ message ActionParameter {
 }
 
 message Output {
-    string table = 1;
-    repeated Field fields = 2;
+  string table = 1;
+  repeated Field fields = 2;
 }
 
 message Field {
-    string name = 1;
-    string type = 2;
+  string name = 1;
+  string type = 2;
 }
 
 message Action {
-    string name = 1;
-    string description = 2;
-    bool active = 3;
-    repeated ActionParameter parameters = 4;
-    Output output = 5;
+  string name = 1;
+  string description = 2;
+  bool active = 3;
+  repeated ActionParameter parameters = 4;
+  Output output = 5;
 }
 
 message ActionList {
@@ -52,9 +53,19 @@ message ActionList {
 message ExecuteActionRequest {
   string name = 1;
   map<string, string> parameters = 2;
+
+  bytes context = 3;
 }
 
 message ExecuteActionResponse {
   int64 error_code = 1;
   bytes result = 2;
+  repeated Row rows = 3;
+
+  bytes context = 4;
+  bytes log_buffer = 5;
+}
+
+message Row {
+  map<string, string> data = 1;
 }
