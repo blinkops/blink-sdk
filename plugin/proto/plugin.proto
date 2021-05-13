@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package plugin;
+package integration_pack;
 
 option go_package = "github.com/blinkops/plugin-sdk/proto";
 

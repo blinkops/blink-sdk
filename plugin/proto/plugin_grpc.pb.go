@@ -33,7 +33,7 @@ func NewPluginClient(cc grpc.ClientConnInterface) PluginClient {
 
 func (c *pluginClient) Describe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PluginDescription, error) {
 	out := new(PluginDescription)
-	err := c.cc.Invoke(ctx, "/plugin.Plugin/Describe", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/Describe", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *pluginClient) Describe(ctx context.Context, in *Empty, opts ...grpc.Cal
 
 func (c *pluginClient) GetActions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ActionList, error) {
 	out := new(ActionList)
-	err := c.cc.Invoke(ctx, "/plugin.Plugin/GetActions", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/GetActions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *pluginClient) GetActions(ctx context.Context, in *Empty, opts ...grpc.C
 
 func (c *pluginClient) ExecuteAction(ctx context.Context, in *ExecuteActionRequest, opts ...grpc.CallOption) (*ExecuteActionResponse, error) {
 	out := new(ExecuteActionResponse)
-	err := c.cc.Invoke(ctx, "/plugin.Plugin/ExecuteAction", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/ExecuteAction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func _Plugin_Describe_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plugin.Plugin/Describe",
+		FullMethod: "/integration_pack.Plugin/Describe",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PluginServer).Describe(ctx, req.(*Empty))
@@ -122,7 +122,7 @@ func _Plugin_GetActions_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plugin.Plugin/GetActions",
+		FullMethod: "/integration_pack.Plugin/GetActions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PluginServer).GetActions(ctx, req.(*Empty))
@@ -140,7 +140,7 @@ func _Plugin_ExecuteAction_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plugin.Plugin/ExecuteAction",
+		FullMethod: "/integration_pack.Plugin/ExecuteAction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PluginServer).ExecuteAction(ctx, req.(*ExecuteActionRequest))
@@ -152,7 +152,7 @@ func _Plugin_ExecuteAction_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Plugin_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "plugin.Plugin",
+	ServiceName: "integration_pack.Plugin",
 	HandlerType: (*PluginServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
