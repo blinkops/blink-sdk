@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/blinkops/plugin-sdk/plugin"
 	pb "github.com/blinkops/plugin-sdk/plugin/proto"
+	log "github.com/sirupsen/logrus"
 )
 
 type PluginGRPCService struct {
@@ -78,14 +80,31 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 		Parameters: request.Parameters,
 	}
 
-	response, err := service.plugin.ExecuteAction(&actionRequest)
+	rawContext := map[string]interface{}{}
+	if len(request.Context) > 0 {
+		err := json.Unmarshal(request.Context, &rawContext)
+		if err != nil {
+			log.Error("Failed to unmarshal action context with error: ", err)
+			return nil, err
+		}
+	}
+
+	actionContext := plugin.NewActionContext(rawContext)
+	response, err := service.plugin.ExecuteAction(actionContext, &actionRequest)
 	if err != nil {
 		return nil, err
+	}
+
+	updatedActionContext, err := actionContext.GetMarshaledContext()
+	if err != nil {
+		log.Error("Failed to marshal context after action execution, error: ", err)
 	}
 
 	res := &pb.ExecuteActionResponse{
 		ErrorCode: response.ErrorCode,
 		Result:    response.Result,
+		Context:   updatedActionContext,
+		LogBuffer: actionContext.GetRawLogBuffer(),
 	}
 
 	for _, row := range response.Rows {

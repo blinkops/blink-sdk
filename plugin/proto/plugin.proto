@@ -53,12 +53,17 @@ message ActionList {
 message ExecuteActionRequest {
   string name = 1;
   map<string, string> parameters = 2;
+
+  bytes context = 3;
 }
 
 message ExecuteActionResponse {
   int64 error_code = 1;
   bytes result = 2;
   repeated Row rows = 3;
+
+  bytes context = 4;
+  bytes log_buffer = 5;
 }
 
 message Row {
