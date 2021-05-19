@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/blinkops/plugin-sdk/plugin/context"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,20 +35,27 @@ func NewActionContext(context map[string]interface{}) *ActionContext {
 }
 
 func (ctx *ActionContext) GetValue(key string) (interface{}, error) {
-	value, ok := ctx.internalContext[key]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("no entry with name %s found", key))
+	value, err := context.Get(key, ctx.internalContext)
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("no entry with name %s found, error: %v", key, err))
 	}
 
 	return value, nil
 }
 
 func (ctx *ActionContext) SetValue(key string, value interface{}) {
-	ctx.internalContext[key] = value
+	err := context.Set(key, value, ctx.internalContext)
+	if err != nil {
+		return
+	}
 }
 
 func (ctx *ActionContext) DeleteEntry(key string) {
-	delete(ctx.internalContext, key)
+	err := context.Delete(key, ctx.internalContext)
+	if err != nil {
+		return
+	}
 }
 
 func (ctx *ActionContext) GetMarshaledContext() ([]byte, error) {
