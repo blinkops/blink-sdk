@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/blinkops/plugin-sdk/plugin/context"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type ActionContext struct {
@@ -16,7 +16,7 @@ type ActionContext struct {
 	// TODO: Connections (Credentials)
 
 	// Logging
-	logger    *logrus.Logger
+	logger    *log.Logger
 	logBuffer *bytes.Buffer
 }
 
@@ -24,7 +24,7 @@ func NewActionContext(context map[string]interface{}) *ActionContext {
 
 	logBuffer := bytes.Buffer{}
 
-	logger := logrus.New()
+	logger := log.New()
 	logger.Out = &logBuffer
 
 	return &ActionContext{
@@ -70,6 +70,6 @@ func (ctx *ActionContext) GetRawLogBuffer() []byte {
 	return ctx.logBuffer.Bytes()
 }
 
-func (ctx *ActionContext) GetLogger() *logrus.Logger {
+func (ctx *ActionContext) GetLogger() *log.Logger {
 	return ctx.logger
 }

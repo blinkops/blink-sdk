@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/go-yaml/yaml"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"sync"
 )
@@ -32,14 +32,14 @@ func loadConfigurationFromDisk(configFilePath string) (*Config, error) {
 
 	rawYamlBytes, err := os.ReadFile(configFilePath)
 	if err != nil {
-		logrus.Error("Failed to read action file ", err)
+		log.Error("Failed to read action file ", err)
 		return nil, err
 	}
 
 	config := Config{}
 	err = yaml.Unmarshal(rawYamlBytes, &config)
 	if err != nil {
-		logrus.Error("Failed to unmarshal configuration ", err)
+		log.Error("Failed to unmarshal configuration ", err)
 		return nil, err
 	}
 
