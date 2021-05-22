@@ -1,5 +1,7 @@
 package plugin
 
+import "github.com/blinkops/plugin-sdk/plugin/connections"
+
 type ActionParameter struct {
 	Type        string `yaml:"type"`
 	Description string `yaml:"description"`
@@ -30,6 +32,7 @@ type Description struct {
 	Description string   `yaml:"description"`
 	Tags        []string `yaml:"tags"`
 	Provider    string   `yaml:"provider"`
+	Connections map[string]connections.Connection `yaml:"connections"`
 }
 
 type ExecuteActionRequest struct {

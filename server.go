@@ -1,4 +1,4 @@
-package plugin_sdk
+package main
 
 import (
 	"github.com/blinkops/plugin-sdk/plugin"

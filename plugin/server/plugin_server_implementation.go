@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/blinkops/plugin-sdk/plugin"
+	"github.com/blinkops/plugin-sdk/plugin/connections"
 	pb "github.com/blinkops/plugin-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
 )
@@ -12,6 +13,33 @@ type PluginGRPCService struct {
 	pb.UnimplementedPluginServer
 
 	plugin plugin.Implementation
+}
+
+func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
+
+	protoConnections := map[string]*pb.Connection{}
+	for connectionName, connection := range connections {
+
+		protoConnectionFields := map[string]*pb.ConnectionField{}
+		for fieldName, field := range connection.Fields {
+			protoConnectionFields[fieldName] = &pb.ConnectionField{
+				Name:        field.Name,
+				Type:        field.FieldType,
+				Required:    field.Required,
+				PlaceHolder: field.Placeholder,
+				InputType:   field.InputType,
+				Patterns:    field.Pattern,
+				Values:      field.Values,
+			}
+		}
+
+		protoConnections[connectionName] = &pb.Connection{
+			Name:   connectionName,
+			Fields: protoConnectionFields,
+		}
+	}
+
+	return protoConnections
 }
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
@@ -25,7 +53,8 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Name:        pluginDescription.Name,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
-		Actions: actions.Actions,
+		Actions:     actions.Actions,
+		Connections: translateToProtoConnections(pluginDescription.Connections),
 	}, nil
 }
 
@@ -73,12 +102,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 	return &pb.ActionList{Actions: protoActions}, nil
 }
 
-func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
-
-	actionRequest := plugin.ExecuteActionRequest{
-		Name:       request.Name,
-		Parameters: request.Parameters,
-	}
+func translateActionContext(request *pb.ExecuteActionRequest) (map[string]interface{}, error) {
 
 	rawContext := map[string]interface{}{}
 	if len(request.Context) > 0 {
@@ -89,7 +113,42 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 		}
 	}
 
-	actionContext := plugin.NewActionContext(rawContext)
+	return rawContext, nil
+}
+
+func translateConnectionInstances(request *pb.ExecuteActionRequest) (map[string]connections.ConnectionInstance, error) {
+
+	concreteConnections := map[string]connections.ConnectionInstance{}
+	for protoName, protoConnection := range request.Connections {
+		concreteConnections[protoName] = connections.ConnectionInstance{
+			VaultUrl: protoConnection.VaultUrl,
+			Name:     protoConnection.Name,
+			Id:       protoConnection.Id,
+			Token:    protoConnection.Token,
+		}
+	}
+
+	return concreteConnections, nil
+}
+
+func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+
+	actionRequest := plugin.ExecuteActionRequest{
+		Name:       request.Name,
+		Parameters: request.Parameters,
+	}
+
+	rawContext, err := translateActionContext(request)
+	if err != nil {
+		return nil, err
+	}
+
+	connectionInstances, err := translateConnectionInstances(request)
+	if err != nil {
+		return nil, err
+	}
+
+	actionContext := plugin.NewActionContext(rawContext, connectionInstances)
 	response, err := service.plugin.ExecuteAction(actionContext, &actionRequest)
 	if err != nil {
 		return nil, err

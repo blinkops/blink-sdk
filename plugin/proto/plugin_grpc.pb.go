@@ -169,5 +169,5 @@ var Plugin_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "plugin/proto/plugin.proto",
+	Metadata: "plugin.proto",
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/blinkops/plugin-sdk/plugin/connections"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,14 +13,14 @@ type ActionContext struct {
 	// Context
 	internalContext map[string]interface{} `json:"raw_context"`
 
-	// TODO: Connections (Credentials)
+	connections map[string]connections.ConnectionInstance
 
 	// Logging
 	logger    *logrus.Logger
 	logBuffer *bytes.Buffer
 }
 
-func NewActionContext(context map[string]interface{}) *ActionContext {
+func NewActionContext(context map[string]interface{}, connections map[string]connections.ConnectionInstance) *ActionContext {
 
 	logBuffer := bytes.Buffer{}
 
@@ -30,6 +31,7 @@ func NewActionContext(context map[string]interface{}) *ActionContext {
 		internalContext: context,
 		logger:          logger,
 		logBuffer:       &logBuffer,
+		connections:     connections,
 	}
 }
 
@@ -64,4 +66,13 @@ func (ctx *ActionContext) GetRawLogBuffer() []byte {
 
 func (ctx *ActionContext) GetLogger() *logrus.Logger {
 	return ctx.logger
+}
+
+func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, error) {
+	connectionInstance, ok := ctx.connections[name]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("connection with %s is missing in action context", name))
+	}
+
+	return connectionInstance.ResolveCredentials()
 }
