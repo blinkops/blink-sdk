@@ -1,6 +1,12 @@
 package plugin
 
-import "github.com/blinkops/plugin-sdk/plugin/connections"
+import (
+	"errors"
+	"github.com/blinkops/plugin-sdk/plugin/connections"
+
+	"encoding/json"
+	log "github.com/sirupsen/logrus"
+)
 
 type ActionParameter struct {
 	Type        string `yaml:"type"`
@@ -28,10 +34,10 @@ type Output struct {
 }
 
 type Description struct {
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Tags        []string `yaml:"tags"`
-	Provider    string   `yaml:"provider"`
+	Name        string                            `yaml:"name"`
+	Description string                            `yaml:"description"`
+	Tags        []string                          `yaml:"tags"`
+	Provider    string                            `yaml:"provider"`
 	Connections map[string]connections.Connection `yaml:"connections"`
 }
 
@@ -55,4 +61,28 @@ type Implementation interface {
 
 	GetActions() []Action
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
+}
+
+func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
+	_, ok := req.Parameters["parameters_as_json"]
+	if ok {
+		return nil, errors.New(ErrParametersAsJsonProvided)
+	}
+	return req.Parameters, nil
+}
+
+func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string]interface{}, error) {
+	parametersAsJson, ok := req.Parameters["parameters_as_json"]
+	if !ok {
+		return nil, errors.New(ErrNoParametersAsJsonProvided)
+	}
+
+	actionParameters := make(map[string]interface{})
+	err := json.Unmarshal([]byte(parametersAsJson), &actionParameters)
+	if err != nil {
+		log.Error("Failed to unmarshal action parameters, err: ", err)
+		return nil, err
+	}
+
+	return actionParameters, nil
 }
