@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -59,19 +60,26 @@ type Implementation interface {
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
 }
 
-func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string] interface{}, error) {
-	actionParameters := make(map[string]interface{})
-	parametersAsJson, ok := req.Parameters["parameters_as_json"]
+func (req *ExecuteActionRequest) GetParameters() (map[string] string, error) {
+	_, ok := req.Parameters["parameters_as_json"]
 	if ok {
-		err := json.Unmarshal([]byte(parametersAsJson), &actionParameters)
-		if err != nil {
-			log.Error("Failed to unmarshal action parameters, err: ", err)
-			return nil, err
-		}
-	} else {
-		for key, value := range req.Parameters {
-			actionParameters[key] = value
-		}
+		return nil, errors.New(ErrParametersAsJsonProvided)
 	}
+	return req.Parameters, nil
+}
+
+func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string] interface{}, error) {
+	parametersAsJson, ok := req.Parameters["parameters_as_json"]
+	if !ok {
+		return nil, errors.New(ErrNoParametersAsJsonProvided)
+	}
+
+	actionParameters := make(map[string]interface{})
+	err := json.Unmarshal([]byte(parametersAsJson), &actionParameters)
+	if err != nil {
+		log.Error("Failed to unmarshal action parameters, err: ", err)
+		return nil, err
+	}
+	
 	return actionParameters, nil
 }
