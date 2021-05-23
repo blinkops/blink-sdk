@@ -34,7 +34,7 @@ func NewActionContext(context map[string]interface{}) *ActionContext {
 	}
 }
 
-func resolveInnerItems(key string, createKeys bool, innerContext map[string] interface{}) (map[string] interface{}, error) {
+func resolveInnerItems(key string, createKeys bool, innerContext map[string]interface{}) (map[string]interface{}, error) {
 	pathToInnerKey := strings.Split(key, ".")
 
 	depth := len(pathToInnerKey) - 1
@@ -83,7 +83,7 @@ func (ctx *ActionContext) getInnerContext(key string, createKeys bool) (map[stri
 		return nil, fmt.Errorf("provided key is not allowed, tried to acces unknown path, %v", key)
 	}
 
-	innerContext, ok := innerContextInterface.(map[string] interface{})
+	innerContext, ok := innerContextInterface.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("failed to access path, %v", key)
 	}
@@ -101,7 +101,7 @@ func (ctx *ActionContext) GetValue(key string) (interface{}, error) {
 		return nil, fmt.Errorf("no entry with name %s found, error: %v", key, err)
 	}
 	pathToInnerKey := strings.Split(key, ".")
-	return innerContext[pathToInnerKey[len(pathToInnerKey) - 1]], nil
+	return innerContext[pathToInnerKey[len(pathToInnerKey)-1]], nil
 }
 
 func (ctx *ActionContext) SetValue(key string, value interface{}) {
@@ -111,7 +111,7 @@ func (ctx *ActionContext) SetValue(key string, value interface{}) {
 		return
 	}
 	pathToInnerKey := strings.Split(key, ".")
-	innerContext[pathToInnerKey[len(pathToInnerKey) - 1]] = value
+	innerContext[pathToInnerKey[len(pathToInnerKey)-1]] = value
 }
 
 func (ctx *ActionContext) DeleteEntry(key string) {
@@ -121,7 +121,7 @@ func (ctx *ActionContext) DeleteEntry(key string) {
 		return
 	}
 	pathToInnerKey := strings.Split(key, ".")
-	delete(innerContext, pathToInnerKey[len(pathToInnerKey) - 1])
+	delete(innerContext, pathToInnerKey[len(pathToInnerKey)-1])
 }
 
 func (ctx *ActionContext) GetMarshaledContext() ([]byte, error) {
