@@ -19,6 +19,8 @@ message PluginDescription {
   string provider = 4;
   repeated Action actions = 5;
   string image = 6;
+
+  map<string, Connection> connections = 7;
 }
 
 message ActionParameter {
@@ -55,6 +57,7 @@ message ExecuteActionRequest {
   map<string, string> parameters = 2;
 
   bytes context = 3;
+  map<string, ConnectionInstance> connections = 4;
 }
 
 message ExecuteActionResponse {
@@ -68,4 +71,27 @@ message ExecuteActionResponse {
 
 message Row {
   map<string, string> data = 1;
+}
+
+message Connection {
+  string name = 1;
+  map<string, ConnectionField> fields = 2;
+}
+
+message ConnectionField {
+  string name = 1;
+  string type = 2;
+  bool required = 3;
+  string place_holder = 4;
+  string input_type = 5;
+  string patterns = 6;
+
+  repeated string values = 7;
+}
+
+message ConnectionInstance {
+  string vault_url = 1;
+  string name = 2;
+  string id = 4;
+  string token = 5;
 }

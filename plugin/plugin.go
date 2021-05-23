@@ -1,8 +1,10 @@
 package plugin
 
 import (
-	"encoding/json"
 	"errors"
+	"github.com/blinkops/plugin-sdk/plugin/connections"
+
+	"encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,10 +34,11 @@ type Output struct {
 }
 
 type Description struct {
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Tags        []string `yaml:"tags"`
-	Provider    string   `yaml:"provider"`
+	Name        string                            `yaml:"name"`
+	Description string                            `yaml:"description"`
+	Tags        []string                          `yaml:"tags"`
+	Provider    string                            `yaml:"provider"`
+	Connections map[string]connections.Connection `yaml:"connections"`
 }
 
 type ExecuteActionRequest struct {
@@ -60,7 +63,7 @@ type Implementation interface {
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
 }
 
-func (req *ExecuteActionRequest) GetParameters() (map[string] string, error) {
+func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
 	_, ok := req.Parameters["parameters_as_json"]
 	if ok {
 		return nil, errors.New(ErrParametersAsJsonProvided)
@@ -68,7 +71,7 @@ func (req *ExecuteActionRequest) GetParameters() (map[string] string, error) {
 	return req.Parameters, nil
 }
 
-func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string] interface{}, error) {
+func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string]interface{}, error) {
 	parametersAsJson, ok := req.Parameters["parameters_as_json"]
 	if !ok {
 		return nil, errors.New(ErrNoParametersAsJsonProvided)
@@ -80,6 +83,6 @@ func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string] interf
 		log.Error("Failed to unmarshal action parameters, err: ", err)
 		return nil, err
 	}
-	
+
 	return actionParameters, nil
 }
