@@ -21,6 +21,7 @@ type PluginClient interface {
 	Describe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PluginDescription, error)
 	GetActions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ActionList, error)
 	ExecuteAction(ctx context.Context, in *ExecuteActionRequest, opts ...grpc.CallOption) (*ExecuteActionResponse, error)
+	TestCredentials(ctx context.Context, in *TestCredentialsRequest, opts ...grpc.CallOption) (*TestCredentialsResponse, error)
 }
 
 type pluginClient struct {
@@ -58,6 +59,15 @@ func (c *pluginClient) ExecuteAction(ctx context.Context, in *ExecuteActionReque
 	return out, nil
 }
 
+func (c *pluginClient) TestCredentials(ctx context.Context, in *TestCredentialsRequest, opts ...grpc.CallOption) (*TestCredentialsResponse, error) {
+	out := new(TestCredentialsResponse)
+	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/TestCredentials", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PluginServer is the server API for Plugin service.
 // All implementations must embed UnimplementedPluginServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type PluginServer interface {
 	Describe(context.Context, *Empty) (*PluginDescription, error)
 	GetActions(context.Context, *Empty) (*ActionList, error)
 	ExecuteAction(context.Context, *ExecuteActionRequest) (*ExecuteActionResponse, error)
+	TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error)
 	mustEmbedUnimplementedPluginServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedPluginServer) GetActions(context.Context, *Empty) (*ActionLis
 }
 func (UnimplementedPluginServer) ExecuteAction(context.Context, *ExecuteActionRequest) (*ExecuteActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExecuteAction not implemented")
+}
+func (UnimplementedPluginServer) TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TestCredentials not implemented")
 }
 func (UnimplementedPluginServer) mustEmbedUnimplementedPluginServer() {}
 
@@ -148,6 +162,24 @@ func _Plugin_ExecuteAction_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Plugin_TestCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PluginServer).TestCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/integration_pack.Plugin/TestCredentials",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PluginServer).TestCredentials(ctx, req.(*TestCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Plugin_ServiceDesc is the grpc.ServiceDesc for Plugin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var Plugin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ExecuteAction",
 			Handler:    _Plugin_ExecuteAction_Handler,
+		},
+		{
+			MethodName: "TestCredentials",
+			Handler:    _Plugin_TestCredentials_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

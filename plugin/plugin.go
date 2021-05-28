@@ -12,6 +12,7 @@ type ActionParameter struct {
 	Type        string `yaml:"type"`
 	Description string `yaml:"description"`
 	Required    bool   `yaml:"required"`
+	Default     string `yaml:"default"`
 }
 
 type Action struct {
@@ -56,11 +57,18 @@ type ProviderConfiguration struct {
 	ConfigurationMap map[interface{}]interface{}
 }
 
+type CredentialsValidationResponse struct {
+	AreCredentialsValid   bool
+	RawValidationResponse []byte
+}
+
 type Implementation interface {
 	Describe() Description
 
 	GetActions() []Action
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
+
+	TestCredentials(map[string]connections.ConnectionInstance) (*CredentialsValidationResponse, error)
 }
 
 func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
