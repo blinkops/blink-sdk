@@ -8,6 +8,7 @@ service Plugin {
   rpc Describe(Empty) returns (PluginDescription) {}
   rpc GetActions(Empty) returns (ActionList) {}
   rpc ExecuteAction(ExecuteActionRequest) returns (ExecuteActionResponse) {}
+  rpc TestCredentials(TestCredentialsRequest) returns (TestCredentialsResponse) {}
 }
 
 message Empty {}
@@ -28,6 +29,7 @@ message ActionParameter {
   string type = 2;
   string description = 3;
   bool required = 4;
+  string default = 5;
 }
 
 message Output {
@@ -94,4 +96,13 @@ message ConnectionInstance {
   string name = 2;
   string id = 4;
   string token = 5;
+}
+
+message TestCredentialsRequest {
+  map<string, ConnectionInstance> connections = 1;
+}
+
+message TestCredentialsResponse {
+  bool are_credentials_valid = 1;
+  bytes raw_validation_response = 2;
 }

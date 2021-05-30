@@ -78,6 +78,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 				Type:        parameter.Type,
 				Description: parameter.Description,
 				Required:    parameter.Required,
+				Default:     parameter.Default,
 			}
 
 			protoParameters = append(protoParameters, protoParameter)
@@ -116,10 +117,10 @@ func translateActionContext(request *pb.ExecuteActionRequest) (map[string]interf
 	return rawContext, nil
 }
 
-func translateConnectionInstances(request *pb.ExecuteActionRequest) (map[string]connections.ConnectionInstance, error) {
+func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInstance) (map[string]connections.ConnectionInstance, error) {
 
 	concreteConnections := map[string]connections.ConnectionInstance{}
-	for protoName, protoConnection := range request.Connections {
+	for protoName, protoConnection := range protoConnections {
 		concreteConnections[protoName] = connections.ConnectionInstance{
 			VaultUrl: protoConnection.VaultUrl,
 			Name:     protoConnection.Name,
@@ -143,7 +144,7 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 		return nil, err
 	}
 
-	connectionInstances, err := translateConnectionInstances(request)
+	connectionInstances, err := translateConnectionInstances(request.Connections)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +173,26 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 	}
 
 	return res, nil
+}
+
+func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
+
+	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
+	if err != nil {
+		log.Error("Failed to translate connections, error: ", err)
+		return nil, err
+	}
+
+	validationResponse, err := service.plugin.TestCredentials(connectionsToBeValidated)
+	if err != nil {
+		log.Error("Failed to validate connections, err: ", err)
+		return nil, err
+	}
+
+	return &pb.TestCredentialsResponse{
+		AreCredentialsValid:   validationResponse.AreCredentialsValid,
+		RawValidationResponse: validationResponse.RawValidationResponse,
+	}, nil
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {

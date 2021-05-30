@@ -151,3 +151,11 @@ func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, e
 
 	return connectionInstance.ResolveCredentials()
 }
+
+func (ctx *ActionContext) GetAllConnections() map[string]connections.ConnectionInstance {
+	return ctx.connections
+}
+
+func (ctx *ActionContext) ReplaceContext(context map[string]interface{}) {
+	ctx.internalContext = context
+}
