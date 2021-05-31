@@ -58,6 +58,12 @@ func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error
 		return nil, err
 	}
 
+	if secrets == nil {
+		err = fmt.Errorf("completed the request successfully but no secrets returned with path %s", vaultSecretPath)
+		log.Error(err)
+		return nil, err
+	}
+
 	if secrets.Data == nil {
 		err = errors.New("invalid secret structure, data map missing")
 		log.Error(err)
