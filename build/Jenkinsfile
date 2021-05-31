@@ -13,6 +13,7 @@ node ("ci") {
   pipeline.isMultiImage = false
   pipeline.runUnitTests = false
   pipeline.pushImage = false
+  pipeline.tagPrefix = "v"
 
   pipeline.run()
 
