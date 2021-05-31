@@ -1,14 +1,14 @@
 package plugin_sdk
 
 import (
-	"github.com/blinkops/plugin-sdk/plugin"
-	"github.com/blinkops/plugin-sdk/plugin/config"
-	"github.com/blinkops/plugin-sdk/plugin/server"
+	"github.com/blinkops/blink-sdk/plugin"
+	"github.com/blinkops/blink-sdk/plugin/config"
+	"github.com/blinkops/blink-sdk/plugin/server"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
 
-	pb "github.com/blinkops/plugin-sdk/plugin/proto"
+	pb "github.com/blinkops/blink-sdk/plugin/proto"
 )
 
 const (

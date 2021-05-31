@@ -3,9 +3,9 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"github.com/blinkops/plugin-sdk/plugin"
-	"github.com/blinkops/plugin-sdk/plugin/connections"
-	pb "github.com/blinkops/plugin-sdk/plugin/proto"
+	"github.com/blinkops/blink-sdk/plugin"
+	"github.com/blinkops/blink-sdk/plugin/connections"
+	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package integration_pack;
 
-option go_package = "github.com/blinkops/plugin-sdk/proto";
+option go_package = "github.com/blinkops/blink-sdk/proto";
 
 service Plugin {
   rpc Describe(Empty) returns (PluginDescription) {}

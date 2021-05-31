@@ -3,6 +3,6 @@
 ######################################################################
 FROM golang:1.16.3
 
-WORKDIR /go/src/github.com/blinkops/plugin-sdk
+WORKDIR /go/src/github.com/blinkops/blink-sdk
 COPY .. .
 RUN go build ./cmd/main

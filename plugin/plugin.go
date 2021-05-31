@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"errors"
-	"github.com/blinkops/plugin-sdk/plugin/connections"
+	"github.com/blinkops/blink-sdk/plugin/connections"
 
 	"encoding/json"
 	log "github.com/sirupsen/logrus"

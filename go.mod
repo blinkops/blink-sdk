@@ -1,4 +1,4 @@
-module github.com/blinkops/plugin-sdk
+module github.com/blinkops/blink-sdk
 
 go 1.16
 

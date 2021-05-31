@@ -1,7 +1,7 @@
 package description
 
 import (
-	"github.com/blinkops/plugin-sdk/plugin"
+	"github.com/blinkops/blink-sdk/plugin"
 	"github.com/go-yaml/yaml"
 	log "github.com/sirupsen/logrus"
 	"os"
