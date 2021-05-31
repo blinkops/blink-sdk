@@ -73,7 +73,7 @@ func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error
 
 	internalSecretData, ok := internalSecret.(map[string]interface{})
 	if !ok {
-		err = errors.New("invalid secret data structure, failed to cast")
+		err = errors.New("invalid secret structure, data entry is missing")
 		log.Error(err)
 		return nil, err
 	}
