@@ -58,9 +58,24 @@ func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error
 		return nil, err
 	}
 
-	internalSecretData, ok := secrets.Data[secretDataKey].(map[string]interface{})
+	if secrets.Data == nil {
+		err = errors.New("invalid secret structure, data map missing")
+		log.Error(err)
+		return nil, err
+	}
+
+	internalSecret, ok := secrets.Data[secretDataKey]
 	if !ok {
-		return nil, errors.New("invalid secret structure, internal data missing")
+		err = errors.New("invalid secret structure, internal data missing")
+		log.Error(err)
+		return nil, err
+	}
+
+	internalSecretData, ok := internalSecret.(map[string]interface{})
+	if !ok {
+		err = errors.New("invalid secret structure, data entry is missing")
+		log.Error(err)
+		return nil, err
 	}
 
 	return internalSecretData, nil
