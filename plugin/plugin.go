@@ -40,6 +40,7 @@ type Description struct {
 	Tags        []string                          `yaml:"tags"`
 	Provider    string                            `yaml:"provider"`
 	Connections map[string]connections.Connection `yaml:"connections"`
+	Version     string                            `yaml:"version"`
 }
 
 type ExecuteActionRequest struct {

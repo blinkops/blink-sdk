@@ -55,6 +55,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
 		Actions:     actions.Actions,
 		Connections: translateToProtoConnections(pluginDescription.Connections),
+		Version:     pluginDescription.Version,
 	}, nil
 }
 

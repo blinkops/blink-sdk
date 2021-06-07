@@ -20,8 +20,8 @@ message PluginDescription {
   string provider = 4;
   repeated Action actions = 5;
   string image = 6;
-
   map<string, Connection> connections = 7;
+  string version = 8;
 }
 
 message ActionParameter {
