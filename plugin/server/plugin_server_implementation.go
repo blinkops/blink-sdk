@@ -133,7 +133,18 @@ func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInst
 	return concreteConnections, nil
 }
 
+func implaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) {
+	if request.Parameters == nil {
+		request.Parameters = map[string]string{}
+	}
+
+	if request.Connections == nil {
+		request.Connections = map[string]*pb.ConnectionInstance{}
+	}
+}
+
 func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+	implaceDefaultExecuteActionRequestValues(request)
 
 	actionRequest := plugin.ExecuteActionRequest{
 		Name:       request.Name,
