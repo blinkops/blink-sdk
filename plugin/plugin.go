@@ -12,9 +12,9 @@ type ActionParameter struct {
 	Type        string   `yaml:"type"`
 	Description string   `yaml:"description"`
 	Required    bool     `yaml:"required"`
-	Pattern     string   `json:"pattern"` // optional: regex to validate in case of input component
-	Options     []string `json:"options"` // optional: the option list in case of dropdown\checkbox
 	Default     string   `yaml:"default"`
+	Pattern     string   `yaml:"pattern"` // optional: regex to validate in case of input component
+	Options     []string `yaml:"options"` // optional: the option list in case of dropdown\checkbox
 }
 
 type Action struct {

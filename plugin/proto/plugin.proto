@@ -30,6 +30,8 @@ message ActionParameter {
   string description = 3;
   bool required = 4;
   string default = 5;
+  string pattern = 6;
+  repeated string options = 7;
 }
 
 message Output {
