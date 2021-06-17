@@ -80,6 +80,8 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 				Description: parameter.Description,
 				Required:    parameter.Required,
 				Default:     parameter.Default,
+				Pattern:     parameter.Pattern,
+				Options:     parameter.Options,
 			}
 
 			protoParameters = append(protoParameters, protoParameter)
