@@ -51,7 +51,8 @@ func GetConfig() *Config {
 	configInitGuard.Do(func() {
 		configFilePath := os.Getenv(ConfigurationPathEnvVar)
 		if configFilePath == "" {
-			panic("Plugin configuration path not supplied")
+			log.Warn("Plugin configuration path not supplied")
+			return
 		}
 
 		loadedConfiguration, err := loadConfigurationFromDisk(configFilePath)
@@ -64,4 +65,12 @@ func GetConfig() *Config {
 	})
 
 	return configInstance
+}
+
+func GetServerPort() string {
+	config := GetConfig()
+	if config == nil {
+		return "1337"
+	}
+	return config.Server.Port
 }

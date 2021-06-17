@@ -16,7 +16,7 @@ const (
 )
 
 func registerNetworkListener() (*net.Listener, error) {
-	listenConfiguration := ":" + config.GetConfig().Server.Port
+	listenConfiguration := ":" + config.GetServerPort()
 	log.Infof("Starting grpc listener on port %s\n", listenConfiguration)
 	listener, err := net.Listen(ListenMode, listenConfiguration)
 	if err != nil {
