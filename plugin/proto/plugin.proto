@@ -25,14 +25,7 @@ message PluginDescription {
 }
 
 message ActionParameter {
-  string name = 1;
-  string type = 2;
-  bool required = 3;
-  string description = 4;
-  string placeholder = 5;
-  string default = 6;
-  string pattern = 7;
-  repeated string options = 8;
+  FormField field = 1;
 }
 
 message Output {
@@ -84,14 +77,18 @@ message Connection {
 }
 
 message ConnectionField {
+  FormField field = 1;
+}
+
+message FormField {
   string name = 1;
   string type = 2;
-  bool required = 3;
-  string description = 4;
-  string placeholder = 5;
-  string default = 6;
-  string input_type = 7;
-  string patterns = 8;
+  string input_type = 3;
+  bool required = 4;
+  string description = 5;
+  string placeholder = 6;
+  string default = 7;
+  string pattern = 8;
   repeated string options = 9;
 }
 

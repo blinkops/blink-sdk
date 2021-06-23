@@ -23,15 +23,17 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 		protoConnectionFields := map[string]*pb.ConnectionField{}
 		for fieldName, field := range connection.Fields {
 			protoConnectionFields[fieldName] = &pb.ConnectionField{
-				Name:        field.Name,
-				Type:        field.FieldType,
-				Required:    field.Required,
-				Description: field.Description,
-				Placeholder: field.Placeholder,
-				InputType:   field.InputType,
-				Default:     field.Default,
-				Patterns:    field.Pattern,
-				Options:     field.Options,
+				Field: &pb.FormField{
+					Name:        field.Name,
+					Type:        field.FieldType,
+					InputType:   field.InputType,
+					Required:    field.Required,
+					Description: field.Description,
+					Placeholder: field.Placeholder,
+					Default:     field.Default,
+					Pattern:     field.Pattern,
+					Options:     field.Options,
+				},
 			}
 		}
 
@@ -77,14 +79,16 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 		var protoParameters []*pb.ActionParameter
 		for name, parameter := range action.Parameters {
 			protoParameter := &pb.ActionParameter{
-				Name:        name,
-				Type:        parameter.Type,
-				Description: parameter.Description,
-				Placeholder: parameter.Placeholder,
-				Required:    parameter.Required,
-				Default:     parameter.Default,
-				Pattern:     parameter.Pattern,
-				Options:     parameter.Options,
+				Field: &pb.FormField{
+					Name:        name,
+					Type:        parameter.Type,
+					Description: parameter.Description,
+					Placeholder: parameter.Placeholder,
+					Required:    parameter.Required,
+					Default:     parameter.Default,
+					Pattern:     parameter.Pattern,
+					Options:     parameter.Options,
+				},
 			}
 
 			protoParameters = append(protoParameters, protoParameter)

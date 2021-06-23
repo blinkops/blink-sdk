@@ -9,11 +9,11 @@ import (
 type ConnectionField struct {
 	Name        string   `yaml:"name"`
 	FieldType   string   `yaml:"field_type"`
+	InputType   string   `yaml:"input_type"`
 	Required    bool     `yaml:"required"`
 	Description string   `yaml:"description"`
 	Placeholder string   `yaml:"placeholder"`
 	Default     string   `yaml:"default"`
-	InputType   string   `yaml:"input_type"`
 	Pattern     string   `yaml:"pattern"`
 	Options     []string `yaml:"options"`
 }
