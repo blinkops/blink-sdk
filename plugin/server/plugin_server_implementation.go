@@ -26,10 +26,12 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 				Name:        field.Name,
 				Type:        field.FieldType,
 				Required:    field.Required,
-				PlaceHolder: field.Placeholder,
+				Description: field.Description,
+				Placeholder: field.Placeholder,
 				InputType:   field.InputType,
+				Default:     field.Default,
 				Patterns:    field.Pattern,
-				Values:      field.Values,
+				Options:     field.Options,
 			}
 		}
 
@@ -78,6 +80,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 				Name:        name,
 				Type:        parameter.Type,
 				Description: parameter.Description,
+				Placeholder: parameter.Placeholder,
 				Required:    parameter.Required,
 				Default:     parameter.Default,
 				Pattern:     parameter.Pattern,

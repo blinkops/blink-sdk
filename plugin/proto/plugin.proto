@@ -27,11 +27,12 @@ message PluginDescription {
 message ActionParameter {
   string name = 1;
   string type = 2;
-  string description = 3;
-  bool required = 4;
-  string default = 5;
-  string pattern = 6;
-  repeated string options = 7;
+  bool required = 3;
+  string description = 4;
+  string placeholder = 5;
+  string default = 6;
+  string pattern = 7;
+  repeated string options = 8;
 }
 
 message Output {
@@ -86,11 +87,12 @@ message ConnectionField {
   string name = 1;
   string type = 2;
   bool required = 3;
-  string place_holder = 4;
-  string input_type = 5;
-  string patterns = 6;
-
-  repeated string values = 7;
+  string description = 4;
+  string placeholder = 5;
+  string default = 6;
+  string input_type = 7;
+  string patterns = 8;
+  repeated string options = 9;
 }
 
 message ConnectionInstance {
