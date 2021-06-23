@@ -11,6 +11,7 @@ import (
 type ActionParameter struct {
 	Type        string   `yaml:"type"`
 	Description string   `yaml:"description"`
+	Placeholder string   `yaml:"placeholder"`
 	Required    bool     `yaml:"required"`
 	Default     string   `yaml:"default"`
 	Pattern     string   `yaml:"pattern"` // optional: regex to validate in case of input component
