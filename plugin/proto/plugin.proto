@@ -5,13 +5,19 @@ package integration_pack;
 option go_package = "github.com/blinkops/blink-sdk/proto";
 
 service Plugin {
+  rpc HealthProbe(Empty) returns (HealthStatus) {}
+
   rpc Describe(Empty) returns (PluginDescription) {}
   rpc GetActions(Empty) returns (ActionList) {}
   rpc ExecuteAction(ExecuteActionRequest) returns (ExecuteActionResponse) {}
   rpc TestCredentials(TestCredentialsRequest) returns (TestCredentialsResponse) {}
+
+  rpc GetAssets(Empty) returns (Assets) {}
 }
 
 message Empty {}
+
+message HealthStatus {}
 
 message PluginDescription {
   string name = 1;
@@ -106,4 +112,12 @@ message TestCredentialsRequest {
 message TestCredentialsResponse {
   bool are_credentials_valid = 1;
   bytes raw_validation_response = 2;
+}
+
+message PluginIcon {
+  bytes raw_icon_buffer = 1;
+}
+
+message Assets {
+  PluginIcon icon = 1;
 }
