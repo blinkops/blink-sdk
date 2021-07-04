@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/blinkops/blink-sdk/plugin"
+	"github.com/blinkops/blink-sdk/plugin/assets"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
@@ -23,13 +24,17 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 		protoConnectionFields := map[string]*pb.ConnectionField{}
 		for fieldName, field := range connection.Fields {
 			protoConnectionFields[fieldName] = &pb.ConnectionField{
-				Name:        field.Name,
-				Type:        field.FieldType,
-				Required:    field.Required,
-				PlaceHolder: field.Placeholder,
-				InputType:   field.InputType,
-				Patterns:    field.Pattern,
-				Values:      field.Values,
+				Field: &pb.FormField{
+					Name:        field.Name,
+					Type:        field.FieldType,
+					InputType:   field.InputType,
+					Required:    field.Required,
+					Description: field.Description,
+					Placeholder: field.Placeholder,
+					Default:     field.Default,
+					Pattern:     field.Pattern,
+					Options:     field.Options,
+				},
 			}
 		}
 
@@ -75,11 +80,16 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 		var protoParameters []*pb.ActionParameter
 		for name, parameter := range action.Parameters {
 			protoParameter := &pb.ActionParameter{
-				Name:        name,
-				Type:        parameter.Type,
-				Description: parameter.Description,
-				Required:    parameter.Required,
-				Default:     parameter.Default,
+				Field: &pb.FormField{
+					Name:        name,
+					Type:        parameter.Type,
+					Description: parameter.Description,
+					Placeholder: parameter.Placeholder,
+					Required:    parameter.Required,
+					Default:     parameter.Default,
+					Pattern:     parameter.Pattern,
+					Options:     parameter.Options,
+				},
 			}
 
 			protoParameters = append(protoParameters, protoParameter)
@@ -133,7 +143,7 @@ func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInst
 	return concreteConnections, nil
 }
 
-func implaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) {
+func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) {
 	if request.Parameters == nil {
 		request.Parameters = map[string]string{}
 	}
@@ -144,7 +154,7 @@ func implaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 }
 
 func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
-	implaceDefaultExecuteActionRequestValues(request)
+	emplaceDefaultExecuteActionRequestValues(request)
 
 	actionRequest := plugin.ExecuteActionRequest{
 		Name:       request.Name,
@@ -205,6 +215,20 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 		AreCredentialsValid:   validationResponse.AreCredentialsValid,
 		RawValidationResponse: validationResponse.RawValidationResponse,
 	}, nil
+}
+
+func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
+	return &pb.HealthStatus{}, nil
+}
+
+func (service *PluginGRPCService) GetAssets(context.Context, *pb.Empty) (*pb.Assets, error) {
+
+	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory()
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Assets{Icon: &pb.PluginIcon{RawIconBuffer: pluginIconBuffer}}, nil
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
