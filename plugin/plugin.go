@@ -38,12 +38,13 @@ type Output struct {
 }
 
 type Description struct {
-	Name        string                            `yaml:"name"`
-	Description string                            `yaml:"description"`
-	Tags        []string                          `yaml:"tags"`
-	Provider    string                            `yaml:"provider"`
-	Connections map[string]connections.Connection `yaml:"connections"`
-	Version     string                            `yaml:"version"`
+	Name                 string                            `yaml:"name"`
+	Description          string                            `yaml:"description"`
+	Tags                 []string                          `yaml:"tags"`
+	Provider             string                            `yaml:"provider"`
+	Connections          map[string]connections.Connection `yaml:"connections"`
+	ConnectionsReference string                            `yaml:"connections_reference"`
+	Version              string                            `yaml:"version"`
 }
 
 type ExecuteActionRequest struct {

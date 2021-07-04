@@ -22,12 +22,14 @@ type ConnectionField struct {
 // For each requested connection an instance of it will be sent
 // for every action executed.
 type Connection struct {
-	Name   string
-	Fields map[string]ConnectionField
+	Name      string
+	Fields    map[string]ConnectionField
+	Reference string
 }
 
 type RequestedConnections struct {
-	ConnectionTypes map[string]map[string]ConnectionField `yaml:"connection_types"`
+	ConnectionTypeReference string                                `yaml:"connection_type_reference"`
+	ConnectionTypes         map[string]map[string]ConnectionField `yaml:"connection_types"`
 }
 
 func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection, error) {
@@ -50,6 +52,7 @@ func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection,
 		connections[connectionName] = Connection{
 			Name:   connectionName,
 			Fields: connectionFields,
+			Reference: requestedConnections.ConnectionTypeReference,
 		}
 	}
 

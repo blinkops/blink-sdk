@@ -16,7 +16,7 @@ type PluginGRPCService struct {
 	plugin plugin.Implementation
 }
 
-func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
+func translateToProtoConnections(connections map[string]connections.Connection, connectionReference string) map[string]*pb.Connection {
 
 	protoConnections := map[string]*pb.Connection{}
 	for connectionName, connection := range connections {
@@ -41,6 +41,7 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 		protoConnections[connectionName] = &pb.Connection{
 			Name:   connectionName,
 			Fields: protoConnectionFields,
+			Reference: connectionReference,
 		}
 	}
 
@@ -59,7 +60,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
 		Actions:     actions.Actions,
-		Connections: translateToProtoConnections(pluginDescription.Connections),
+		Connections: translateToProtoConnections(pluginDescription.Connections, pluginDescription.ConnectionsReference),
 		Version:     pluginDescription.Version,
 	}, nil
 }
