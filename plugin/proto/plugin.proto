@@ -28,6 +28,7 @@ message PluginDescription {
   string image = 6;
   map<string, Connection> connections = 7;
   string version = 8;
+  string connection_reference = 9;
 }
 
 message ActionParameter {
