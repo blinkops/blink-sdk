@@ -23,8 +23,8 @@ type ConnectionField struct {
 // for every action executed.
 type Connection struct {
 	Name      string
-	Fields    map[string]ConnectionField
-	Reference string
+	Fields    map[string]ConnectionField `yaml:"fields"`
+	Reference string                     `yaml:"reference"`
 }
 
 type RequestedConnections struct {
@@ -45,6 +45,12 @@ func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection,
 		log.Error("Failed to unmarshal raw yaml into requested connections: ", err)
 		return nil, err
 	}
+
+	for connectionName, connection := range requestedConnections.ConnectionTypes {
+		connection.Name = connectionName
+	}
+
+	log.Infoln("Loaded requested connections into memory")
 
 	return requestedConnections.ConnectionTypes, nil
 }
