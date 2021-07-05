@@ -28,8 +28,8 @@ type Connection struct {
 }
 
 type RequestedConnections struct {
-	ConnectionTypeReference string                                `yaml:"connection_type_reference"`
-	ConnectionTypes         map[string]map[string]ConnectionField `yaml:"connection_types"`
+	ConnectionTypeReferences map[string]string                     `yaml:"connection_type_references"`
+	ConnectionTypes          map[string]map[string]ConnectionField `yaml:"connection_types"`
 }
 
 func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection, error) {
@@ -49,10 +49,12 @@ func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection,
 
 	connections := map[string]Connection{}
 	for connectionName, connectionFields := range requestedConnections.ConnectionTypes {
+		typeReference, _ := requestedConnections.ConnectionTypeReferences[connectionName]
+
 		connections[connectionName] = Connection{
-			Name:   connectionName,
-			Fields: connectionFields,
-			Reference: requestedConnections.ConnectionTypeReference,
+			Name:      connectionName,
+			Fields:    connectionFields,
+			Reference: typeReference,
 		}
 	}
 
