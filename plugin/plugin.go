@@ -43,7 +43,6 @@ type Description struct {
 	Tags                  []string                          `yaml:"tags"`
 	Provider              string                            `yaml:"provider"`
 	Connections           map[string]connections.Connection `yaml:"connection_types"`
-	ConnectionsReferences map[string]string                 `yaml:"connection_type_references"`
 	Version               string                            `yaml:"version"`
 }
 
