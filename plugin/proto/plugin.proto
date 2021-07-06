@@ -80,6 +80,7 @@ message Row {
 message Connection {
   string name = 1;
   map<string, ConnectionField> fields = 2;
+  string reference = 3;
 }
 
 message ConnectionField {

@@ -41,6 +41,7 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 		protoConnections[connectionName] = &pb.Connection{
 			Name:   connectionName,
 			Fields: protoConnectionFields,
+			Reference: connection.Reference,
 		}
 	}
 
