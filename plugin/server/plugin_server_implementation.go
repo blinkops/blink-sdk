@@ -39,8 +39,8 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 		}
 
 		protoConnections[connectionName] = &pb.Connection{
-			Name:   connectionName,
-			Fields: protoConnectionFields,
+			Name:      connectionName,
+			Fields:    protoConnectionFields,
 			Reference: connection.Reference,
 		}
 	}
@@ -160,6 +160,7 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 	actionRequest := plugin.ExecuteActionRequest{
 		Name:       request.Name,
 		Parameters: request.Parameters,
+		Timeout:    request.Timeout,
 	}
 
 	rawContext, err := translateActionContext(request)

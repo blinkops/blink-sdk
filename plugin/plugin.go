@@ -52,6 +52,7 @@ type Description struct {
 type ExecuteActionRequest struct {
 	Name       string            `yaml:"name"`
 	Parameters map[string]string `yaml:"parameters"`
+	Timeout    int32             `yaml:"timeout"`
 }
 
 type ExecuteActionResponse struct {
