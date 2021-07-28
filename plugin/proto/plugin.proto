@@ -62,6 +62,7 @@ message ExecuteActionRequest {
 
   bytes context = 3;
   map<string, ConnectionInstance> connections = 4;
+  int32 timeout = 5;
 }
 
 message ExecuteActionResponse {

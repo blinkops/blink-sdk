@@ -3,10 +3,13 @@ package plugin
 import (
 	"errors"
 	"github.com/blinkops/blink-sdk/plugin/connections"
+	"time"
 
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 )
+
+const DefaultTimeout = time.Second
 
 type ActionParameter struct {
 	Type        string   `yaml:"type"`
@@ -38,12 +41,12 @@ type Output struct {
 }
 
 type Description struct {
-	Name                  string                            `yaml:"name"`
-	Description           string                            `yaml:"description"`
-	Tags                  []string                          `yaml:"tags"`
-	Provider              string                            `yaml:"provider"`
-	Connections           map[string]connections.Connection `yaml:"connection_types"`
-	Version               string                            `yaml:"version"`
+	Name        string                            `yaml:"name"`
+	Description string                            `yaml:"description"`
+	Tags        []string                          `yaml:"tags"`
+	Provider    string                            `yaml:"provider"`
+	Connections map[string]connections.Connection `yaml:"connection_types"`
+	Version     string                            `yaml:"version"`
 }
 
 type ExecuteActionRequest struct {
