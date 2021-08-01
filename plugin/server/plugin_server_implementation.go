@@ -3,8 +3,10 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/blinkops/blink-sdk/plugin"
 	"github.com/blinkops/blink-sdk/plugin/assets"
+	"github.com/blinkops/blink-sdk/plugin/config"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
@@ -48,6 +50,23 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 	return protoConnections
 }
 
+func translatePluginType(pluginType string) pb.PluginDescription_PluginType {
+
+	switch pluginType {
+	case config.SharedPluginType:
+		{
+			return pb.PluginDescription_SHARED
+		}
+
+	case config.PrivatePluginType:
+		{
+			return pb.PluginDescription_PRIVATE
+		}
+	}
+
+	panic(fmt.Sprintf("Invalid plugin type configured %s", pluginType))
+}
+
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
 	pluginDescription := service.plugin.Describe()
 	actions, err := service.GetActions(ctx, empty)
@@ -62,6 +81,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Actions:     actions.Actions,
 		Connections: translateToProtoConnections(pluginDescription.Connections),
 		Version:     pluginDescription.Version,
+		PluginType:  translatePluginType(config.GetConfig().Plugin.Type),
 	}, nil
 }
 

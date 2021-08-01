@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/go-yaml/yaml"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -12,6 +13,7 @@ type Config struct {
 		PluginDescriptionFilePath     string `yaml:"plugin_description_file_path"`
 		ActionsFolderPath             string `yaml:"actions_folder_path"`
 		ProviderConfigurationFilePath string `yaml:"provider_configuration_path"`
+		Type                          string `yaml:"type"`
 	}
 
 	Server struct {
@@ -26,6 +28,8 @@ var (
 
 const (
 	ConfigurationPathEnvVar = "CONFIG_FILE_PATH"
+	SharedPluginType        = "shared"
+	PrivatePluginType       = "private"
 )
 
 func loadConfigurationFromDisk(configFilePath string) (*Config, error) {
@@ -46,9 +50,23 @@ func loadConfigurationFromDisk(configFilePath string) (*Config, error) {
 	return &config, nil
 }
 
+func validateConfiguration(config *Config) {
+
+	pluginType := config.Plugin.Type
+	if pluginType == "" {
+		config.Plugin.Type = SharedPluginType
+	}
+
+	if pluginType != SharedPluginType && pluginType != PrivatePluginType {
+		panic(fmt.Sprintf("Invalid plugin type: %s", config.Plugin.Type))
+	}
+
+}
+
 func GetConfig() *Config {
 
 	configInitGuard.Do(func() {
+
 		configFilePath := os.Getenv(ConfigurationPathEnvVar)
 		if configFilePath == "" {
 			log.Warn("Plugin configuration path not supplied")
@@ -56,10 +74,11 @@ func GetConfig() *Config {
 		}
 
 		loadedConfiguration, err := loadConfigurationFromDisk(configFilePath)
-
 		if err != nil {
 			panic(err)
 		}
+
+		validateConfiguration(loadedConfiguration)
 
 		configInstance = loadedConfiguration
 	})
