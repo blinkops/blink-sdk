@@ -55,6 +55,7 @@ func validateConfiguration(config *Config) {
 	pluginType := config.Plugin.Type
 	if pluginType == "" {
 		config.Plugin.Type = SharedPluginType
+		return
 	}
 
 	if pluginType != SharedPluginType && pluginType != PrivatePluginType {
