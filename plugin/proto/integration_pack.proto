@@ -28,6 +28,13 @@ message PluginDescription {
   string image = 6;
   map<string, Connection> connections = 7;
   string version = 8;
+
+  enum PluginType {
+    SHARED = 0;
+    PRIVATE = 1;
+  }
+
+  PluginType plugin_type = 9;
 }
 
 message ActionParameter {
