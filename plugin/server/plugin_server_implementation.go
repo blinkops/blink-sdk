@@ -50,18 +50,17 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 	return protoConnections
 }
 
-func translatePluginType(pluginType string) pb.PluginDescription_PluginType {
+func translatePluginType() pb.PluginDescription_PluginType {
+	if config.GetConfig() == nil {
+		return pb.PluginDescription_SHARED
+	}
+	pluginType := config.GetConfig().Plugin.Type
 
 	switch pluginType {
 	case config.SharedPluginType:
-		{
-			return pb.PluginDescription_SHARED
-		}
-
+		return pb.PluginDescription_SHARED
 	case config.PrivatePluginType:
-		{
-			return pb.PluginDescription_PRIVATE
-		}
+		return pb.PluginDescription_PRIVATE
 	}
 
 	panic(fmt.Sprintf("Invalid plugin type configured %s", pluginType))
@@ -81,7 +80,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		Actions:     actions.Actions,
 		Connections: translateToProtoConnections(pluginDescription.Connections),
 		Version:     pluginDescription.Version,
-		PluginType:  translatePluginType(config.GetConfig().Plugin.Type),
+		PluginType:  translatePluginType(),
 	}, nil
 }
 
