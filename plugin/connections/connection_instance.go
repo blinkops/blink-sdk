@@ -1,21 +1,16 @@
 package connections
 
 import (
-	"errors"
-	"fmt"
-	"github.com/hashicorp/go-cleanhttp"
-	"github.com/hashicorp/go-retryablehttp"
-	vaultapi "github.com/hashicorp/vault/api"
-	log "github.com/sirupsen/logrus"
-	"time"
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 )
 
 const (
-	vaultClientTimeout = time.Second * 60
-	vaultClientRetries = 3
-
-	vaultSecretPathFormat = "secret/data/%s/%s"
-	secretDataKey         = "data"
+	connectionTypeKey = "type"
+	connectionNameKey = "id"
+	tokenKey          = "token"
 )
 
 // ConnectionInstance represents the
@@ -26,61 +21,36 @@ type ConnectionInstance struct {
 	Token    string
 }
 
-func (c *ConnectionInstance) acquireVaultAPIConnection() (*vaultapi.Client, error) {
-	vaultClient, err := vaultapi.NewClient(&vaultapi.Config{
-		Address:    c.VaultUrl,
-		HttpClient: cleanhttp.DefaultPooledClient(),
-		Timeout:    vaultClientTimeout,
-		MaxRetries: vaultClientRetries,
-		Backoff:    retryablehttp.LinearJitterBackoff,
-	})
-
-	if err != nil {
-		log.Error("Failed to create VaultAPI client, error: ", err)
-		return nil, err
-	}
-
-	vaultClient.SetToken(c.Token)
-	return vaultClient, nil
-}
-
 func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error) {
+	client := &http.Client{}
+	connectionData := map[string]string{
+		connectionTypeKey: c.Name,
+		connectionNameKey: c.Id,
+		tokenKey:          c.Token,
+	}
 
-	client, err := c.acquireVaultAPIConnection()
+	marshalledData, err := json.Marshal(connectionData)
+
 	if err != nil {
 		return nil, err
 	}
 
-	vaultSecretPath := fmt.Sprintf(vaultSecretPathFormat, c.Name, c.Id)
-	secrets, err := client.Logical().Read(vaultSecretPath)
+	secretRequest, err := http.NewRequest(http.MethodGet, c.VaultUrl, bytes.NewBuffer(marshalledData))
+
 	if err != nil {
-		log.Errorf("Failed to read secret credentials with path %s, error: %v", vaultSecretPath, err)
 		return nil, err
 	}
 
-	if secrets == nil {
-		err = fmt.Errorf("completed the request successfully but no secrets returned with path %s", vaultSecretPath)
-		log.Error(err)
+	secretResponse, err := client.Do(secretRequest)
+
+	body, err := ioutil.ReadAll(secretResponse.Body)
+	if err != nil {
 		return nil, err
 	}
 
-	if secrets.Data == nil {
-		err = errors.New("invalid secret structure, data map missing")
-		log.Error(err)
-		return nil, err
-	}
+	internalSecretData := map[string]interface{}{}
 
-	internalSecret, ok := secrets.Data[secretDataKey]
-	if !ok {
-		err = errors.New("invalid secret structure, internal data missing")
-		log.Error(err)
-		return nil, err
-	}
-
-	internalSecretData, ok := internalSecret.(map[string]interface{})
-	if !ok {
-		err = errors.New("invalid secret structure, data entry is missing")
-		log.Error(err)
+	if err = json.Unmarshal(body, &internalSecretData); err != nil {
 		return nil, err
 	}
 
