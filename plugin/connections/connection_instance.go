@@ -3,6 +3,7 @@ package connections
 import (
 	"bytes"
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 )
@@ -28,7 +29,11 @@ func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error
 		return nil, err
 	}
 
-	defer func() { _ = secretResponse.Body.Close() }()
+	defer func() {
+		if err = secretResponse.Body.Close(); err != nil {
+			log.Debugf("Failed closing request body when fetching credentials for type: %s, name: %s", c.Name, c.Id)
+		}
+	}()
 
 	body, err := ioutil.ReadAll(secretResponse.Body)
 
