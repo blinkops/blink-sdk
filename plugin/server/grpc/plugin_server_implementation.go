@@ -1,4 +1,4 @@
-package server
+package grpcserver
 
 import (
 	"context"
@@ -12,9 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type PluginService struct {
+type PluginGRPCService struct {
 	pb.UnimplementedPluginServer
-
 	plugin plugin.Implementation
 }
 
