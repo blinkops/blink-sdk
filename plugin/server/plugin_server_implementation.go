@@ -12,14 +12,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type PluginGRPCService struct {
+type PluginService struct {
 	pb.UnimplementedPluginServer
-
 	plugin plugin.Implementation
 }
 
 func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
-
 	protoConnections := map[string]*pb.Connection{}
 	for connectionName, connection := range connections {
 
@@ -46,7 +44,6 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 			Reference: connection.Reference,
 		}
 	}
-
 	return protoConnections
 }
 
@@ -66,7 +63,7 @@ func translatePluginType() pb.PluginDescription_PluginType {
 	panic(fmt.Sprintf("Invalid plugin type configured %s", pluginType))
 }
 
-func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
+func (service *PluginService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
 	pluginDescription := service.plugin.Describe()
 	actions, err := service.GetActions(ctx, empty)
 	if err != nil {
@@ -84,7 +81,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 	}, nil
 }
 
-func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empty) (*pb.ActionList, error) {
+func (service *PluginService) GetActions(ctx context.Context, empty *pb.Empty) (*pb.ActionList, error) {
 
 	actions := service.plugin.GetActions()
 
@@ -173,7 +170,7 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 	}
 }
 
-func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+func (service *PluginService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
 	emplaceDefaultExecuteActionRequestValues(request)
 
 	actionRequest := plugin.ExecuteActionRequest{
@@ -218,7 +215,7 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 	return res, nil
 }
 
-func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
+func (service *PluginService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
 
 	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
 	if err != nil {
@@ -238,11 +235,11 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 	}, nil
 }
 
-func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
+func (service *PluginService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
 	return &pb.HealthStatus{}, nil
 }
 
-func (service *PluginGRPCService) GetAssets(context.Context, *pb.Empty) (*pb.Assets, error) {
+func (service *PluginService) GetAssets(context.Context, *pb.Empty) (*pb.Assets, error) {
 
 	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory()
 	if err != nil {
@@ -252,6 +249,6 @@ func (service *PluginGRPCService) GetAssets(context.Context, *pb.Empty) (*pb.Ass
 	return &pb.Assets{Icon: &pb.PluginIcon{RawIconBuffer: pluginIconBuffer}}, nil
 }
 
-func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
-	return &PluginGRPCService{plugin: plugin}
+func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginService {
+	return &PluginService{plugin: plugin}
 }
