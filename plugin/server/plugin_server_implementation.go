@@ -36,6 +36,8 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 					Default:     field.Default,
 					Pattern:     field.Pattern,
 					Options:     field.Options,
+					Format:      field.Format,
+					IsMulti:     field.IsMulti,
 				},
 			}
 		}
@@ -109,6 +111,8 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 					Default:     parameter.Default,
 					Pattern:     parameter.Pattern,
 					Options:     parameter.Options,
+					Format:      parameter.Format,
+					IsMulti:     parameter.IsMulti,
 				},
 			}
 

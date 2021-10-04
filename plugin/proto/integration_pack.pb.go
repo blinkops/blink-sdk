@@ -865,6 +865,8 @@ type FormField struct {
 	Default     string   `protobuf:"bytes,7,opt,name=default,proto3" json:"default,omitempty"`
 	Pattern     string   `protobuf:"bytes,8,opt,name=pattern,proto3" json:"pattern,omitempty"`
 	Options     []string `protobuf:"bytes,9,rep,name=options,proto3" json:"options,omitempty"`
+	Format      string   `protobuf:"bytes,10,rep,name=format,proto3" json:"format,omitempty"`
+	IsMulti     bool     `protobuf:"bytes,11,rep,name=is_multi,proto3" json:"is_multi,omitempty"`
 }
 
 func (x *FormField) Reset() {
