@@ -36,8 +36,6 @@ func translateToProtoConnections(connections map[string]connections.Connection) 
 					Default:     field.Default,
 					Pattern:     field.Pattern,
 					Options:     field.Options,
-					Format:      field.Format,
-					IsMulti:     field.IsMulti,
 				},
 			}
 		}

@@ -16,8 +16,6 @@ type ConnectionField struct {
 	Default     string   `yaml:"default"`
 	Pattern     string   `yaml:"pattern"`
 	Options     []string `yaml:"options"`
-	Format      string   `yaml:"format"`
-	IsMulti     bool     `yaml:"is_multi"`
 }
 
 // Connection represents a connection type requested by the user.
