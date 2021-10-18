@@ -150,11 +150,11 @@ func translateActionContext(request *pb.ExecuteActionRequest) (map[string]interf
 	return rawContext, nil
 }
 
-func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInstance) (map[string]connections.ConnectionInstance, error) {
+func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInstance) (map[string]*connections.ConnectionInstance, error) {
 
-	concreteConnections := map[string]connections.ConnectionInstance{}
+	concreteConnections := map[string]*connections.ConnectionInstance{}
 	for protoName, protoConnection := range protoConnections {
-		concreteConnections[protoName] = connections.ConnectionInstance{
+		concreteConnections[protoName] = &connections.ConnectionInstance{
 			VaultUrl: protoConnection.VaultUrl,
 			Name:     protoConnection.Name,
 			Id:       protoConnection.Id,
