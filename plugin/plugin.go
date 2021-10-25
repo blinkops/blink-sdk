@@ -19,7 +19,7 @@ type ActionParameter struct {
 	Default     string   `yaml:"default"`
 	Pattern     string   `yaml:"pattern"`  // optional: regex to validate in case of input component
 	Options     []string `yaml:"options"`  // optional: the option list in case of dropdown\checkbox
-	Index       int      `yaml:"index"`    // optional: the ordinal number of the parameter in the parameter list
+	Index       int64    `yaml:"index"`    // optional: the ordinal number of the parameter in the parameter list
 	Format      string   `yaml:"format"`   // optional: format of the field for example -> type: date, format: date_epoch
 	IsMulti     bool     `yaml:"is_multi"` // optional: is this a multi-select field
 }
