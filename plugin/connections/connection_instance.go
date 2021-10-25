@@ -16,13 +16,17 @@ const (
 
 // ConnectionInstance represents the
 type ConnectionInstance struct {
-	VaultUrl string
-	Name     string
-	Id       string
-	Token    string
+	VaultUrl         string
+	Name             string
+	Id               string
+	Token            string
+	cachedSecretData map[string]interface{}
 }
 
 func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error) {
+	if c.cachedSecretData != nil {
+		return c.cachedSecretData, nil
+	}
 	secretResponse, err := c.requestSecret()
 
 	if err != nil {
@@ -47,6 +51,7 @@ func (c *ConnectionInstance) ResolveCredentials() (map[string]interface{}, error
 		return nil, err
 	}
 
+	c.cachedSecretData = internalSecretData
 	return internalSecretData, nil
 }
 

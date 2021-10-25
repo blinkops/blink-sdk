@@ -15,14 +15,14 @@ type ActionContext struct {
 	internalContext map[string]interface{} `json:"raw_context"`
 
 	// Connections
-	connections map[string]connections.ConnectionInstance
+	connections map[string]*connections.ConnectionInstance
 
 	// Logging
 	logger    *log.Logger
 	logBuffer *bytes.Buffer
 }
 
-func NewActionContext(context map[string]interface{}, connections map[string]connections.ConnectionInstance) *ActionContext {
+func NewActionContext(context map[string]interface{}, connections map[string]*connections.ConnectionInstance) *ActionContext {
 
 	logBuffer := bytes.Buffer{}
 
@@ -152,7 +152,7 @@ func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, e
 	return connectionInstance.ResolveCredentials()
 }
 
-func (ctx *ActionContext) GetAllConnections() map[string]connections.ConnectionInstance {
+func (ctx *ActionContext) GetAllConnections() map[string]*connections.ConnectionInstance {
 	return ctx.connections
 }
 

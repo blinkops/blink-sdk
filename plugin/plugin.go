@@ -79,7 +79,7 @@ type Implementation interface {
 	GetActions() []Action
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
 
-	TestCredentials(map[string]connections.ConnectionInstance) (*CredentialsValidationResponse, error)
+	TestCredentials(map[string]*connections.ConnectionInstance) (*CredentialsValidationResponse, error)
 }
 
 func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
