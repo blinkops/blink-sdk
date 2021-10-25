@@ -5,7 +5,7 @@ import blink.jenkins.ci.*
 
 node ("ci") {
 
-  def pipeline = new PluginPipeline(this)
+  def pipeline = new SDKPipeline(this)
   pipeline.projectName = "blink-sdk"
   pipeline.mainBranchName = "master"
   pipeline.submodulesUpdate = true
