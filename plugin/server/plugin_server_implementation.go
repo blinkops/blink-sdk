@@ -109,6 +109,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 					Default:     parameter.Default,
 					Pattern:     parameter.Pattern,
 					Options:     parameter.Options,
+					Index:       parameter.Index,
 					Format:      parameter.Format,
 					IsMulti:     parameter.IsMulti,
 				},

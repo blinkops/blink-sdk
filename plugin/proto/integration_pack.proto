@@ -105,8 +105,9 @@ message FormField {
   string default = 7;
   string pattern = 8;
   repeated string options = 9;
-  string format = 10;
-  bool is_multi = 11;
+  int64 index = 10;
+  string format = 11;
+  bool is_multi = 12;
 }
 
 message ConnectionInstance {
