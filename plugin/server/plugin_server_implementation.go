@@ -207,10 +207,11 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 	}
 
 	res := &pb.ExecuteActionResponse{
-		ErrorCode: response.ErrorCode,
-		Result:    response.Result,
-		Context:   updatedActionContext,
-		LogBuffer: actionContext.GetRawLogBuffer(),
+		ErrorCode:    response.ErrorCode,
+		Result:       response.Result,
+		Context:      updatedActionContext,
+		LogBuffer:    actionContext.GetRawLogBuffer(),
+		ErrorMessage: response.ErrorMessage,
 	}
 
 	for _, row := range response.Rows {

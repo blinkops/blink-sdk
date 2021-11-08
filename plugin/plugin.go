@@ -59,9 +59,10 @@ type ExecuteActionRequest struct {
 }
 
 type ExecuteActionResponse struct {
-	ErrorCode int64  `yaml:"error_code"`
-	Result    []byte `yaml:"result"`
-	Rows      []map[string]string
+	ErrorCode    int64  `yaml:"error_code"`
+	Result       []byte `yaml:"result"`
+	Rows         []map[string]string
+	ErrorMessage string
 }
 
 type ProviderConfiguration struct {

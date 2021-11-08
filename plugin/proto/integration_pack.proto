@@ -79,6 +79,7 @@ message ExecuteActionResponse {
 
   bytes context = 4;
   bytes log_buffer = 5;
+  string error_message = 6;
 }
 
 message Row {
