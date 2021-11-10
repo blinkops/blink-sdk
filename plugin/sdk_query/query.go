@@ -25,29 +25,29 @@ type GenerateFunc func(ctx context.Context, queryContext QueryContext) ([]map[st
 type QueryContext struct {
 	// Constraints is a map from column Name to the details of the
 	// constraints on that column.
-	Constraints map[string]ConstraintList
+	Constraints map[string]ConstraintList `json:"constraints,omitempty"`
 
 	// limit, offset, order by
-	Limit   int
-	Offset  int
-	OrderBy []string
-	Desc    bool
+	Limit   int      `json:"limit,omitempty"`
+	Offset  int      `json:"offset,omitempty"`
+	OrderBy []string `json:"order_by,omitempty"`
+	Desc    bool     `json:"desc,omitempty"`
 
 	// Limit the number of results to protect our RAM usage
-	MaxRows int
+	MaxRows int `json:"max_rows,omitempty"`
 }
 
 // ConstraintList contains the details of the constraints for the given column.
 type ConstraintList struct {
-	Affinity    ColumnType
-	Constraints []Constraint
+	Affinity    ColumnType   `json:"affinity,omitempty"`
+	Constraints []Constraint `json:"constraints,omitempty"`
 }
 
 // Constraint contains both an operator and an expression that are applied as
 // constraints in the query.
 type Constraint struct {
-	Operator   Op
-	Expression string
+	Operator   Op     `json:"operator,omitempty"`
+	Expression string `json:"expression,omitempty"`
 }
 
 // Op is type of operations.
