@@ -47,7 +47,7 @@ type ConstraintList struct {
 // constraints in the query.
 type Constraint struct {
 	Operator   Op     `json:"operator,omitempty"`
-	Expression string `json:"expression,omitempty"`
+	Expression []string `json:"expression,omitempty"`
 }
 
 // Op is type of operations.
