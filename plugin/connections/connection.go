@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+const(
+	MetadataHeader = "grpc-metadata"
+)
+
 type ConnectionField struct {
 	Name        string   `yaml:"name"`
 	FieldType   string   `yaml:"field_type"`
