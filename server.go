@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"net"
 	"os"
+	"strconv"
 )
 
 const (
@@ -37,7 +38,7 @@ func Start(pluginImplementation plugin.Implementation) error {
 	pluginServiceImplementation := server.NewPluginServiceImplementation(pluginImplementation)
 	pb.RegisterPluginServer(grpcServer, pluginServiceImplementation)
 
-	if os.Getenv("dev") != "" {
+	if val, _ := strconv.ParseBool(os.Getenv("USE_REFLECTION")); val {
 		// enable reflection only if the env variable is present.
 		reflection.Register(grpcServer)
 	}

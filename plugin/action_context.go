@@ -154,13 +154,13 @@ func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, e
 
 			// Convert metadata to connection.
 			for k, v := range md.(metadata.MD) {
-				conn[k] = strings.Join(v, ", ")
+				conn[k] = v[0]
 			}
 
 			return conn, nil
 		}
 
-		return nil, errors.New(fmt.Sprintf("connection with %s is missing in action context", name))
+		return nil, fmt.Errorf("connection with %s is missing in action context", name)
 	}
 
 	return connectionInstance.ResolveCredentials()

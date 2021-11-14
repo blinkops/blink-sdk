@@ -7,7 +7,7 @@ import (
 )
 
 const(
-	MetadataHeader = "grpc-metadata"
+	MetadataHeader = "#$__%grpc-#$%metadata#$__%"
 )
 
 type ConnectionField struct {

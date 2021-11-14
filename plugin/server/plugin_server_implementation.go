@@ -202,8 +202,6 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 		return nil, err
 	}
 
-	log.Println(rawContext)
-
 	connectionInstances, err := translateConnectionInstances(request.Connections)
 	if err != nil {
 		return nil, err
