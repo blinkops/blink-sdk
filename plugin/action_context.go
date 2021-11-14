@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 	"strings"
 )
 
@@ -146,7 +147,20 @@ func (ctx *ActionContext) GetLogger() *log.Logger {
 func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, error) {
 	connectionInstance, ok := ctx.connections[name]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("connection with %s is missing in action context", name))
+		// If no connection was provided, use the grpc-metadata.
+		md, ok := ctx.internalContext[connections.MetadataHeader]
+		if ok {
+			conn := map[string]interface{}{}
+
+			// Convert metadata to connection.
+			for k, v := range md.(metadata.MD) {
+				conn[k] = v[0]
+			}
+
+			return conn, nil
+		}
+
+		return nil, fmt.Errorf("connection with %s is missing in action context", name)
 	}
 
 	return connectionInstance.ResolveCredentials()

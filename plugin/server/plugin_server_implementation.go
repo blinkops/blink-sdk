@@ -10,6 +10,7 @@ import (
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 )
 
 type PluginGRPCService struct {
@@ -137,7 +138,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 	return &pb.ActionList{Actions: protoActions}, nil
 }
 
-func translateActionContext(request *pb.ExecuteActionRequest) (map[string]interface{}, error) {
+func translateActionContext(ctx context.Context, request *pb.ExecuteActionRequest) (map[string]interface{}, error) {
 
 	rawContext := map[string]interface{}{}
 	if len(request.Context) > 0 {
@@ -146,6 +147,17 @@ func translateActionContext(request *pb.ExecuteActionRequest) (map[string]interf
 			log.Error("Failed to unmarshal action context with error: ", err)
 			return nil, err
 		}
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+
+	if ok {
+		// remove unnecessary headers from the metadata and store it on the raw context.
+		delete(md, "user-agent")
+		delete(md, "content-type")
+		delete(md, ":authority")
+		rawContext[connections.MetadataHeader] = md
+
 	}
 
 	return rawContext, nil
@@ -176,7 +188,7 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 	}
 }
 
-func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
 	emplaceDefaultExecuteActionRequestValues(request)
 
 	actionRequest := plugin.ExecuteActionRequest{
@@ -185,7 +197,7 @@ func (service *PluginGRPCService) ExecuteAction(_ context.Context, request *pb.E
 		Timeout:    request.Timeout,
 	}
 
-	rawContext, err := translateActionContext(request)
+	rawContext, err := translateActionContext(ctx, request)
 	if err != nil {
 		return nil, err
 	}
