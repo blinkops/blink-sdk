@@ -41,6 +41,7 @@ func Start(pluginImplementation plugin.Implementation) error {
 	if val, _ := strconv.ParseBool(os.Getenv("USE_REFLECTION")); val {
 		// enable reflection only if the env variable is present.
 		reflection.Register(grpcServer)
+		log.Warn("Server is using reflection! [USE_REFLECTION=true]")
 	}
 
 	networkListener, err := registerNetworkListener()
