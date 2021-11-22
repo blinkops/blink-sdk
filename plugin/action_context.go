@@ -149,6 +149,7 @@ func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, e
 	if !ok {
 		// If no connection was provided, use the grpc-metadata.
 		md, ok := ctx.internalContext[connections.MetadataHeader]
+
 		if ok {
 			conn := map[string]interface{}{}
 

@@ -156,7 +156,10 @@ func translateActionContext(ctx context.Context, request *pb.ExecuteActionReques
 		delete(md, "user-agent")
 		delete(md, "content-type")
 		delete(md, ":authority")
-		rawContext[connections.MetadataHeader] = md
+
+		if len(md) > 0 {
+			rawContext[connections.MetadataHeader] = md
+		}
 
 	}
 
