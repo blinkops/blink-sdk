@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	ListenMode = "tcp"
-	DefaultMaxPayload    = 5242880 // 5MB
+	ListenMode        = "tcp"
+	DefaultMaxPayload = 5 * 1024 * 1024 // 5MB
 )
 
 func registerNetworkListener() (*net.Listener, error) {
