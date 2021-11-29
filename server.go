@@ -15,6 +15,7 @@ import (
 
 const (
 	ListenMode = "tcp"
+	DefaultMaxPayload    = 5242880 // 5MB
 )
 
 func registerNetworkListener() (*net.Listener, error) {
@@ -32,7 +33,7 @@ func registerNetworkListener() (*net.Listener, error) {
 func Start(pluginImplementation plugin.Implementation) error {
 	description := pluginImplementation.Describe()
 	log.Infof("Starting %s server.\n", description.Name)
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.MaxRecvMsgSize(DefaultMaxPayload))
 
 	log.Infof("Registering %s service!\n", description.Name)
 	pluginServiceImplementation := server.NewPluginServiceImplementation(pluginImplementation)
