@@ -32,6 +32,7 @@ type QueryContext struct {
 	Offset  int      `json:"offset,omitempty"`
 	OrderBy []string `json:"order_by,omitempty"`
 	Desc    bool     `json:"desc,omitempty"`
+	Columns []string `json:"columns,omitempty"`
 
 	// Limit the number of results to protect our RAM usage
 	MaxRows int `json:"max_rows,omitempty"`
@@ -46,7 +47,7 @@ type ConstraintList struct {
 // Constraint contains both an operator and an expression that are applied as
 // constraints in the query.
 type Constraint struct {
-	Operator   Op     `json:"operator,omitempty"`
+	Operator   Op       `json:"operator,omitempty"`
 	Expression []string `json:"expression,omitempty"`
 }
 
