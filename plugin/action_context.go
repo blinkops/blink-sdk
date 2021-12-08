@@ -161,7 +161,7 @@ func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, e
 			return conn, nil
 		}
 
-		return nil, fmt.Errorf("connection with %s is missing in action context", name)
+		return nil, fmt.Errorf("connection for %s is required for execution, but was not found", name)
 	}
 
 	return connectionInstance.ResolveCredentials()
