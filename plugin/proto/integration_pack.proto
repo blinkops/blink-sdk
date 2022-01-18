@@ -53,10 +53,13 @@ message Field {
 
 message Action {
   string name = 1;
-  string description = 2;
-  bool active = 3;
-  repeated ActionParameter parameters = 4;
-  Output output = 5;
+  string display_name = 2 [json_name="display_name"];
+  string description = 3;
+  bool active = 4;
+  repeated ActionParameter parameters = 5;
+  Output output = 6;
+  string action_to_run = 7 [json_name="action_to_run"];
+  map<string,string> action_to_run_param_values = 8 [json_name="action_to_run_param_values"];
 }
 
 message ActionList {
@@ -98,17 +101,18 @@ message ConnectionField {
 
 message FormField {
   string name = 1;
-  string type = 2;
-  string input_type = 3;
-  bool required = 4;
-  string description = 5;
-  string placeholder = 6;
-  string default = 7;
-  string pattern = 8;
-  repeated string options = 9;
-  int64 index = 10;
-  string format = 11;
-  bool is_multi = 12;
+  string display_name = 2 [json_name="display_name"];
+  string type = 3;
+  string input_type = 4;
+  bool required = 5;
+  string description = 6;
+  string placeholder = 7;
+  string default = 8;
+  string pattern = 9;
+  repeated string options = 10;
+  int64 index = 11;
+  string format = 12;
+  bool is_multi = 13;
 }
 
 message ConnectionInstance {

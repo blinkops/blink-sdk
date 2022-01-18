@@ -93,9 +93,12 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 	for _, action := range actions {
 
 		protoAction := &pb.Action{
-			Name:        action.Name,
-			Description: action.Description,
-			Active:      action.Enabled,
+			Name:                   action.Name,
+			Description:            action.Description,
+			Active:                 action.Enabled,
+			DisplayName:            action.DisplayName,
+			ActionToRun:            action.ActionFullNameToRun,
+			ActionToRunParamValues: action.ActionToRunParamValues,
 		}
 
 		var protoParameters []*pb.ActionParameter
@@ -103,6 +106,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 			protoParameter := &pb.ActionParameter{
 				Field: &pb.FormField{
 					Name:        name,
+					DisplayName: parameter.DisplayName,
 					Type:        parameter.Type,
 					Description: parameter.Description,
 					Placeholder: parameter.Placeholder,

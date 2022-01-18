@@ -12,6 +12,7 @@ import (
 const DefaultTimeout = time.Second
 
 type ActionParameter struct {
+	DisplayName string   `yaml:"display_name,omitempty"`
 	Type        string   `yaml:"type"`
 	Description string   `yaml:"description"`
 	Placeholder string   `yaml:"placeholder"`
@@ -25,12 +26,15 @@ type ActionParameter struct {
 }
 
 type Action struct {
-	Name        string                     `yaml:"name"`
-	Description string                     `yaml:"description"`
-	Enabled     bool                       `yaml:"enabled"`
-	EntryPoint  string                     `yaml:"entry_point"`
-	Parameters  map[string]ActionParameter `yaml:"parameters"`
-	Output      *Output
+	Name                   string                     `yaml:"name"`
+	DisplayName            string                     `yaml:"display_name,omitempty"`
+	Description            string                     `yaml:"description"`
+	Enabled                bool                       `yaml:"enabled"`
+	EntryPoint             string                     `yaml:"entry_point"`
+	Parameters             map[string]ActionParameter `yaml:"parameters"`
+	Output                 *Output
+	ActionFullNameToRun    string            `yaml:"action_to_run"`
+	ActionToRunParamValues map[string]string `yaml:"action_to_run_param_values"`
 }
 
 type Field struct {
