@@ -85,7 +85,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 	}, nil
 }
 
-func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empty) (*pb.ActionList, error) {
+func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*pb.ActionList, error) {
 
 	actions := service.plugin.GetActions()
 
@@ -94,6 +94,7 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 
 		protoAction := &pb.Action{
 			Name:        action.Name,
+			DisplayName: action.DisplayName,
 			Description: action.Description,
 			Active:      action.Enabled,
 		}
