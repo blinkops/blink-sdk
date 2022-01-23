@@ -57,6 +57,7 @@ message Action {
   bool active = 3;
   repeated ActionParameter parameters = 4;
   Output output = 5;
+  string display_name = 6;
 }
 
 message ActionList {
