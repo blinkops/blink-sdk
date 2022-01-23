@@ -96,6 +96,8 @@ func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empt
 			Name:        action.Name,
 			Description: action.Description,
 			Active:      action.Enabled,
+			DisplayName: action.DisplayName,
+			IconUri:     action.IconUri,
 		}
 
 		var protoParameters []*pb.ActionParameter
@@ -261,14 +263,31 @@ func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.H
 	return &pb.HealthStatus{}, nil
 }
 
-func (service *PluginGRPCService) GetAssets(context.Context, *pb.Empty) (*pb.Assets, error) {
+func (service *PluginGRPCService) GetAssets(_ context.Context, request *pb.GetAssetsRequest) (*pb.Assets, error) {
+	iconUri := ""
+	if !request.GetIntegrationIcon() && request.GetActionName() != "" {
+		for _, action := range service.plugin.GetActions() {
+			if action.Name == request.GetActionName() {
+				iconUri = action.IconUri
+				break
+			}
+		}
+	}
 
-	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory()
+	if iconUri == "" {
+		iconUri = assets.PluginIconPath
+	}
+
+	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory(iconUri)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.Assets{Icon: &pb.PluginIcon{RawIconBuffer: pluginIconBuffer}}, nil
+	return &pb.Assets{
+		Icon: &pb.PluginIcon{
+			RawIconBuffer: pluginIconBuffer,
+		},
+	}, nil
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {

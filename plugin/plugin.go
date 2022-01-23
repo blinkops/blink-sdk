@@ -31,6 +31,8 @@ type Action struct {
 	EntryPoint  string                     `yaml:"entry_point"`
 	Parameters  map[string]ActionParameter `yaml:"parameters"`
 	Output      *Output
+	DisplayName string `yaml:"display_name"`
+	IconUri     string `yaml:"icon_uri"`
 }
 
 type Field struct {

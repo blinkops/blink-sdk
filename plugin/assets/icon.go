@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	pluginIconPath = "assets/icon.svg"
+	PluginIconPath = "assets/icon.svg"
 )
 
-func ReadPluginIconBufferIntoMemory() ([]byte, error) {
+func ReadPluginIconBufferIntoMemory(iconUri string) ([]byte, error) {
 
-	iconBuffer, err := ioutil.ReadFile(pluginIconPath)
+	iconBuffer, err := ioutil.ReadFile(iconUri)
 	if err != nil {
 		log.Errorf("Failed to read icon into memory with error %v", err)
 		return nil, err
