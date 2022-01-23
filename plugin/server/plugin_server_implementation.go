@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/blinkops/blink-sdk/plugin"
+	"github.com/blinkops/blink-sdk/plugin/assets"
 	"github.com/blinkops/blink-sdk/plugin/config"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
@@ -75,7 +76,6 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 
 	return &pb.PluginDescription{
 		Name:        pluginDescription.Name,
-		IconUri:     pluginDescription.IconUri,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
 		Actions:     actions.Actions,
@@ -85,7 +85,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 	}, nil
 }
 
-func (service *PluginGRPCService) GetActions(ctx context.Context, empty *pb.Empty) (*pb.ActionList, error) {
+func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*pb.ActionList, error) {
 
 	actions := service.plugin.GetActions()
 
@@ -263,19 +263,26 @@ func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.H
 	return &pb.HealthStatus{}, nil
 }
 
-func (service *PluginGRPCService) GetIcon(_ context.Context, request *pb.GetIconRequest) (*pb.GetIconResponse, error) {
-	iconUri := service.plugin.Describe().IconUri
-	if request.GetActionName() != "" {
+func (service *PluginGRPCService) GetAssets(_ context.Context, request *pb.GetAssetsRequest) (*pb.GetAssetsResponse, error) {
+	iconUri := assets.PluginIconPath
+	if request.GetName() != "" {
 		for _, action := range service.plugin.GetActions() {
-			if action.Name == request.GetActionName() {
-				iconUri = action.IconUri
+			if action.Name == request.GetName() {
+				if uri := action.IconUri; uri != "" {
+					iconUri = uri
+				}
 				break
 			}
 		}
 	}
 
-	return &pb.GetIconResponse{
-		IconUri: iconUri,
+	iconBuffer, err := assets.ReadPluginIconBufferIntoMemory(iconUri)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetAssetsResponse{
+		Icon: &pb.PluginIcon{RawIconBuffer: iconBuffer},
 	}, nil
 }
 

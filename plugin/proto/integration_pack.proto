@@ -12,7 +12,7 @@ service Plugin {
   rpc ExecuteAction(ExecuteActionRequest) returns (ExecuteActionResponse) {}
   rpc TestCredentials(TestCredentialsRequest) returns (TestCredentialsResponse) {}
 
-  rpc GetIcon(GetIconRequest) returns (GetIconResponse) {}
+  rpc GetAssets(GetAssetsRequest) returns (GetAssetsResponse) {}
 }
 
 message Empty {}
@@ -35,7 +35,6 @@ message PluginDescription {
   }
 
   PluginType plugin_type = 9;
-  string icon_uri = 10;
 }
 
 message ActionParameter {
@@ -130,10 +129,14 @@ message TestCredentialsResponse {
   bytes raw_validation_response = 2;
 }
 
-message GetIconRequest {
-  string action_name = 1;
+message PluginIcon {
+  bytes raw_icon_buffer = 1;
 }
 
-message GetIconResponse {
-  string icon_uri = 1;
+message GetAssetsRequest {
+  string name = 1;
+}
+
+message GetAssetsResponse {
+  PluginIcon icon = 1;
 }
