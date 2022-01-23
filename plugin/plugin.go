@@ -47,6 +47,7 @@ type Output struct {
 
 type Description struct {
 	Name        string                            `yaml:"name"`
+	IconUri     string                            `yaml:"icon_uri"`
 	Description string                            `yaml:"description"`
 	Tags        []string                          `yaml:"tags"`
 	Provider    string                            `yaml:"provider"`

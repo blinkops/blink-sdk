@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/blinkops/blink-sdk/plugin"
-	"github.com/blinkops/blink-sdk/plugin/assets"
 	"github.com/blinkops/blink-sdk/plugin/config"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
@@ -76,6 +75,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 
 	return &pb.PluginDescription{
 		Name:        pluginDescription.Name,
+		IconUri:     pluginDescription.IconUri,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
 		Actions:     actions.Actions,
@@ -263,9 +263,9 @@ func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.H
 	return &pb.HealthStatus{}, nil
 }
 
-func (service *PluginGRPCService) GetAssets(_ context.Context, request *pb.GetAssetsRequest) (*pb.Assets, error) {
-	iconUri := ""
-	if !request.GetIntegrationIcon() && request.GetActionName() != "" {
+func (service *PluginGRPCService) GetIcon(_ context.Context, request *pb.GetIconRequest) (*pb.GetIconResponse, error) {
+	iconUri := service.plugin.Describe().IconUri
+	if request.GetActionName() != "" {
 		for _, action := range service.plugin.GetActions() {
 			if action.Name == request.GetActionName() {
 				iconUri = action.IconUri
@@ -274,19 +274,8 @@ func (service *PluginGRPCService) GetAssets(_ context.Context, request *pb.GetAs
 		}
 	}
 
-	if iconUri == "" {
-		iconUri = assets.PluginIconPath
-	}
-
-	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory(iconUri)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.Assets{
-		Icon: &pb.PluginIcon{
-			RawIconBuffer: pluginIconBuffer,
-		},
+	return &pb.GetIconResponse{
+		IconUri: iconUri,
 	}, nil
 }
 

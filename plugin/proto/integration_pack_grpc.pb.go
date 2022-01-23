@@ -23,7 +23,7 @@ type PluginClient interface {
 	GetActions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ActionList, error)
 	ExecuteAction(ctx context.Context, in *ExecuteActionRequest, opts ...grpc.CallOption) (*ExecuteActionResponse, error)
 	TestCredentials(ctx context.Context, in *TestCredentialsRequest, opts ...grpc.CallOption) (*TestCredentialsResponse, error)
-	GetAssets(ctx context.Context, in *GetAssetsRequest, opts ...grpc.CallOption) (*Assets, error)
+	GetIcon(ctx context.Context, in *GetIconRequest, opts ...grpc.CallOption) (*GetIconResponse, error)
 }
 
 type pluginClient struct {
@@ -79,9 +79,9 @@ func (c *pluginClient) TestCredentials(ctx context.Context, in *TestCredentialsR
 	return out, nil
 }
 
-func (c *pluginClient) GetAssets(ctx context.Context, in *GetAssetsRequest, opts ...grpc.CallOption) (*Assets, error) {
-	out := new(Assets)
-	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/GetAssets", in, out, opts...)
+func (c *pluginClient) GetIcon(ctx context.Context, in *GetIconRequest, opts ...grpc.CallOption) (*GetIconResponse, error) {
+	out := new(GetIconResponse)
+	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/GetIcon", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ type PluginServer interface {
 	GetActions(context.Context, *Empty) (*ActionList, error)
 	ExecuteAction(context.Context, *ExecuteActionRequest) (*ExecuteActionResponse, error)
 	TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error)
-	GetAssets(context.Context, *GetAssetsRequest) (*Assets, error)
+	GetIcon(context.Context, *GetIconRequest) (*GetIconResponse, error)
 	mustEmbedUnimplementedPluginServer()
 }
 
@@ -120,8 +120,8 @@ func (UnimplementedPluginServer) ExecuteAction(context.Context, *ExecuteActionRe
 func (UnimplementedPluginServer) TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TestCredentials not implemented")
 }
-func (UnimplementedPluginServer) GetAssets(context.Context, *GetAssetsRequest) (*Assets, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAssets not implemented")
+func (UnimplementedPluginServer) GetIcon(context.Context, *GetIconRequest) (*GetIconResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIcon not implemented")
 }
 func (UnimplementedPluginServer) mustEmbedUnimplementedPluginServer() {}
 
@@ -226,20 +226,20 @@ func _Plugin_TestCredentials_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Plugin_GetAssets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAssetsRequest)
+func _Plugin_GetIcon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIconRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PluginServer).GetAssets(ctx, in)
+		return srv.(PluginServer).GetIcon(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/integration_pack.Plugin/GetAssets",
+		FullMethod: "/integration_pack.Plugin/GetIcon",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PluginServer).GetAssets(ctx, req.(*GetAssetsRequest))
+		return srv.(PluginServer).GetIcon(ctx, req.(*GetIconRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -272,8 +272,8 @@ var Plugin_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Plugin_TestCredentials_Handler,
 		},
 		{
-			MethodName: "GetAssets",
-			Handler:    _Plugin_GetAssets_Handler,
+			MethodName: "GetIcon",
+			Handler:    _Plugin_GetIcon_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
