@@ -23,7 +23,6 @@ type PluginClient interface {
 	GetActions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ActionList, error)
 	ExecuteAction(ctx context.Context, in *ExecuteActionRequest, opts ...grpc.CallOption) (*ExecuteActionResponse, error)
 	TestCredentials(ctx context.Context, in *TestCredentialsRequest, opts ...grpc.CallOption) (*TestCredentialsResponse, error)
-	GetAssets(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Assets, error)
 }
 
 type pluginClient struct {
@@ -79,15 +78,6 @@ func (c *pluginClient) TestCredentials(ctx context.Context, in *TestCredentialsR
 	return out, nil
 }
 
-func (c *pluginClient) GetAssets(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Assets, error) {
-	out := new(Assets)
-	err := c.cc.Invoke(ctx, "/integration_pack.Plugin/GetAssets", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PluginServer is the server API for Plugin service.
 // All implementations must embed UnimplementedPluginServer
 // for forward compatibility
@@ -97,7 +87,6 @@ type PluginServer interface {
 	GetActions(context.Context, *Empty) (*ActionList, error)
 	ExecuteAction(context.Context, *ExecuteActionRequest) (*ExecuteActionResponse, error)
 	TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error)
-	GetAssets(context.Context, *Empty) (*Assets, error)
 	mustEmbedUnimplementedPluginServer()
 }
 
@@ -119,9 +108,6 @@ func (UnimplementedPluginServer) ExecuteAction(context.Context, *ExecuteActionRe
 }
 func (UnimplementedPluginServer) TestCredentials(context.Context, *TestCredentialsRequest) (*TestCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TestCredentials not implemented")
-}
-func (UnimplementedPluginServer) GetAssets(context.Context, *Empty) (*Assets, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAssets not implemented")
 }
 func (UnimplementedPluginServer) mustEmbedUnimplementedPluginServer() {}
 
@@ -226,24 +212,6 @@ func _Plugin_TestCredentials_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Plugin_GetAssets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PluginServer).GetAssets(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/integration_pack.Plugin/GetAssets",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PluginServer).GetAssets(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Plugin_ServiceDesc is the grpc.ServiceDesc for Plugin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -270,10 +238,6 @@ var Plugin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TestCredentials",
 			Handler:    _Plugin_TestCredentials_Handler,
-		},
-		{
-			MethodName: "GetAssets",
-			Handler:    _Plugin_GetAssets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
