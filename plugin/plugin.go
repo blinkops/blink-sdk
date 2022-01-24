@@ -26,6 +26,7 @@ type ActionParameter struct {
 
 type Action struct {
 	Name        string                     `yaml:"name"`
+	IconUri     string                     `yaml:"icon_uri"`
 	DisplayName string                     `yaml:"display_name"`
 	Description string                     `yaml:"description"`
 	Enabled     bool                       `yaml:"enabled"`
@@ -51,6 +52,7 @@ type Description struct {
 	Provider    string                            `yaml:"provider"`
 	Connections map[string]connections.Connection `yaml:"connection_types"`
 	Version     string                            `yaml:"version"`
+	IconUri     string                            `yaml:"icon_uri"`
 }
 
 type ExecuteActionRequest struct {

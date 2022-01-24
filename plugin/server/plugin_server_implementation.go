@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/blinkops/blink-sdk/plugin"
-	"github.com/blinkops/blink-sdk/plugin/assets"
 	"github.com/blinkops/blink-sdk/plugin/config"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
@@ -76,6 +75,7 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 
 	return &pb.PluginDescription{
 		Name:        pluginDescription.Name,
+		IconUri:     pluginDescription.IconUri,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
 		Actions:     actions.Actions,
@@ -94,6 +94,7 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 
 		protoAction := &pb.Action{
 			Name:        action.Name,
+			IconUri:     action.IconUri,
 			DisplayName: action.DisplayName,
 			Description: action.Description,
 			Active:      action.Enabled,
@@ -260,16 +261,6 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
 	return &pb.HealthStatus{}, nil
-}
-
-func (service *PluginGRPCService) GetAssets(context.Context, *pb.Empty) (*pb.Assets, error) {
-
-	pluginIconBuffer, err := assets.ReadPluginIconBufferIntoMemory()
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.Assets{Icon: &pb.PluginIcon{RawIconBuffer: pluginIconBuffer}}, nil
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
