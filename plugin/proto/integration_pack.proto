@@ -58,6 +58,7 @@ message Action {
   Output output = 5;
   string display_name = 6;
   string icon_uri = 7;
+  string collection_name = 8;
 }
 
 message ActionList {
