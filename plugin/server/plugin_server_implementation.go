@@ -159,11 +159,6 @@ func translateActionContext(ctx context.Context, request *pb.ExecuteActionReques
 		delete(md, "user-agent")
 		delete(md, "content-type")
 		delete(md, ":authority")
-
-		if len(md) > 0 {
-			rawContext[connections.MetadataHeader] = md
-		}
-
 	}
 
 	return rawContext, nil
@@ -174,10 +169,9 @@ func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInst
 	concreteConnections := map[string]*connections.ConnectionInstance{}
 	for protoName, protoConnection := range protoConnections {
 		concreteConnections[protoName] = &connections.ConnectionInstance{
-			VaultUrl: protoConnection.VaultUrl,
-			Name:     protoConnection.Name,
-			Id:       protoConnection.Id,
-			Token:    protoConnection.Token,
+			Name: protoConnection.Name,
+			Id:   protoConnection.Id,
+			Data: protoConnection.Data,
 		}
 	}
 

@@ -114,10 +114,9 @@ message FormField {
 }
 
 message ConnectionInstance {
-  string vault_url = 1;
   string name = 2;
   string id = 4;
-  string token = 5;
+  map<string, string> data = 6;
 }
 
 message TestCredentialsRequest {
