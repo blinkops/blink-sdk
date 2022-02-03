@@ -25,15 +25,17 @@ type ActionParameter struct {
 }
 
 type Action struct {
-	Name           string                     `yaml:"name"`
-	IconUri        string                     `yaml:"icon_uri"`
-	DisplayName    string                     `yaml:"display_name"`
-	CollectionName string                     `yaml:"collection_name"`
-	Description    string                     `yaml:"description"`
-	Enabled        bool                       `yaml:"enabled"`
-	EntryPoint     string                     `yaml:"entry_point"`
-	Parameters     map[string]ActionParameter `yaml:"parameters"`
-	Output         *Output
+	Name                 string                            `yaml:"name"`
+	IconUri              string                            `yaml:"icon_uri"`
+	DisplayName          string                            `yaml:"display_name"`
+	CollectionName       string                            `yaml:"collection_name"`
+	Description          string                            `yaml:"description"`
+	Enabled              bool                              `yaml:"enabled"`
+	EntryPoint           string                            `yaml:"entry_point"`
+	Parameters           map[string]ActionParameter        `yaml:"parameters"`
+	Connections          map[string]connections.Connection `yaml:"connection_types"`
+	IsConnectionRequired bool                              `yaml:"is_connection_required"`
+	Output               *Output
 }
 
 type Field struct {
