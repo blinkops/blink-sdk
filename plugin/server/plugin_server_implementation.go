@@ -93,12 +93,14 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 	for _, action := range actions {
 
 		protoAction := &pb.Action{
-			Name:           action.Name,
-			IconUri:        action.IconUri,
-			DisplayName:    action.DisplayName,
-			CollectionName: action.CollectionName,
-			Description:    action.Description,
-			Active:         action.Enabled,
+			Name:                 action.Name,
+			IconUri:              action.IconUri,
+			DisplayName:          action.DisplayName,
+			CollectionName:       action.CollectionName,
+			Description:          action.Description,
+			Active:               action.Enabled,
+			Connections:          translateToProtoConnections(action.Connections),
+			IsConnectionRequired: action.IsConnectionRequired,
 		}
 
 		var protoParameters []*pb.ActionParameter

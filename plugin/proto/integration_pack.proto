@@ -59,6 +59,8 @@ message Action {
   string display_name = 6;
   string icon_uri = 7;
   string collection_name = 8;
+  map<string, Connection> connections = 9;
+  bool is_connection_required = 10;
 }
 
 message ActionList {
