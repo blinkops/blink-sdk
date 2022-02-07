@@ -69,8 +69,6 @@ func translatePluginType() pb.PluginDescription_PluginType {
 }
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
-	service.updateLastUse()
-
 	pluginDescription := service.plugin.Describe()
 	actions, err := service.GetActions(ctx, empty)
 	if err != nil {
@@ -90,8 +88,6 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 }
 
 func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*pb.ActionList, error) {
-	service.updateLastUse()
-
 	actions := service.plugin.GetActions()
 
 	var protoActions []*pb.Action
@@ -197,6 +193,7 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 
 func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
 	service.updateLastUse()
+	defer service.updateLastUse()
 
 	emplaceDefaultExecuteActionRequestValues(request)
 
@@ -245,6 +242,7 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 
 func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
 	service.updateLastUse()
+	defer service.updateLastUse()
 
 	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
 	if err != nil {
@@ -271,12 +269,19 @@ func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.H
 }
 
 func (service *PluginGRPCService) updateLastUse() {
-	service.lastUse = time.Now().In(time.UTC).UnixNano()
+	currentTime := timeNowNano()
+	if currentTime > service.lastUse {
+		service.lastUse = currentTime
+	}
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
 	return &PluginGRPCService{
 		plugin:  plugin,
-		lastUse: time.Now().In(time.UTC).UnixNano(),
+		lastUse: timeNowNano(),
 	}
+}
+
+func timeNowNano() int64 {
+	return time.Now().UnixNano()
 }
