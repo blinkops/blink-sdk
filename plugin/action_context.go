@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/blinkops/blink-sdk/plugin/connections"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/metadata"
 	"strings"
 )
 
@@ -143,13 +144,27 @@ func (ctx *ActionContext) GetLogger() *log.Logger {
 	return ctx.logger
 }
 
-func (ctx *ActionContext) GetCredentials(name string) (map[string]string, error) {
+func (ctx *ActionContext) GetCredentials(name string) (map[string]interface{}, error) {
 	connectionInstance, ok := ctx.connections[name]
 	if !ok {
+		// If no connection was provided, use the grpc-metadata.
+		md, ok := ctx.internalContext[connections.MetadataHeader]
+
+		if ok {
+			conn := map[string]interface{}{}
+
+			// Convert metadata to connection.
+			for k, v := range md.(metadata.MD) {
+				conn[k] = v[0]
+			}
+
+			return conn, nil
+		}
+
 		return nil, fmt.Errorf("connection for %s is required for execution, but was not found", name)
 	}
 
-	return connectionInstance.Data, nil
+	return connectionInstance.ResolveCredentials()
 }
 
 func (ctx *ActionContext) GetAllConnections() map[string]*connections.ConnectionInstance {

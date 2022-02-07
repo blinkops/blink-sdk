@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+const(
+	MetadataHeader = "#$__%grpc-#$%metadata#$__%"
+)
+
 type ConnectionField struct {
 	Name        string   `yaml:"name"`
 	FieldType   string   `yaml:"field_type"`
@@ -31,7 +35,6 @@ type RequestedConnections struct {
 	ConnectionTypes map[string]Connection `yaml:"connection_types"`
 }
 
-//goland:noinspection GoUnusedExportedFunction
 func LoadConnectionsFromDisk(connectionsFilePath string) (map[string]Connection, error) {
 
 	rawYamlBytes, err := os.ReadFile(connectionsFilePath)
