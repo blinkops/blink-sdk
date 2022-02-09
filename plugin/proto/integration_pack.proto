@@ -15,7 +15,9 @@ service Plugin {
 
 message Empty {}
 
-message HealthStatus {}
+message HealthStatus {
+  int64 last_use = 1;
+}
 
 message PluginDescription {
   string name = 1;

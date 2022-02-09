@@ -10,12 +10,14 @@ import (
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
+	"time"
 )
 
 type PluginGRPCService struct {
 	pb.UnimplementedPluginServer
 
-	plugin plugin.Implementation
+	plugin  plugin.Implementation
+	lastUse int64
 }
 
 func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
@@ -191,6 +193,9 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 }
 
 func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+	service.updateLastUse()
+	defer service.updateLastUse()
+
 	emplaceDefaultExecuteActionRequestValues(request)
 
 	actionRequest := plugin.ExecuteActionRequest{
@@ -237,6 +242,8 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 }
 
 func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
+	service.updateLastUse()
+	defer service.updateLastUse()
 
 	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
 	if err != nil {
@@ -257,9 +264,25 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 }
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
-	return &pb.HealthStatus{}, nil
+	return &pb.HealthStatus{
+		LastUse: service.lastUse,
+	}, nil
+}
+
+func (service *PluginGRPCService) updateLastUse() {
+	currentTime := timeNowNano()
+	if currentTime > service.lastUse {
+		service.lastUse = currentTime
+	}
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
-	return &PluginGRPCService{plugin: plugin}
+	return &PluginGRPCService{
+		plugin:  plugin,
+		lastUse: timeNowNano(),
+	}
+}
+
+func timeNowNano() int64 {
+	return time.Now().UnixNano()
 }
