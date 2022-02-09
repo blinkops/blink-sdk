@@ -78,10 +78,11 @@ func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty)
 		IconUri:     pluginDescription.IconUri,
 		Description: pluginDescription.Description,
 		Tags:        pluginDescription.Tags, Provider: pluginDescription.Provider,
-		Actions:     actions.Actions,
-		Connections: translateToProtoConnections(pluginDescription.Connections),
-		Version:     pluginDescription.Version,
-		PluginType:  translatePluginType(),
+		Actions:              actions.Actions,
+		Connections:          translateToProtoConnections(pluginDescription.Connections),
+		Version:              pluginDescription.Version,
+		PluginType:           translatePluginType(),
+		IsConnectionOptional: pluginDescription.IsConnectionOptional,
 	}, nil
 }
 
@@ -100,7 +101,7 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 			Description:          action.Description,
 			Active:               action.Enabled,
 			Connections:          translateToProtoConnections(action.Connections),
-			IsConnectionRequired: action.IsConnectionRequired,
+			IsConnectionOptional: action.IsConnectionOptional,
 		}
 
 		var protoParameters []*pb.ActionParameter
