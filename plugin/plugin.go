@@ -34,7 +34,7 @@ type Action struct {
 	EntryPoint           string                            `yaml:"entry_point"`
 	Parameters           map[string]ActionParameter        `yaml:"parameters"`
 	Connections          map[string]connections.Connection `yaml:"connection_types"`
-	IsConnectionOptional bool                              `yaml:"is_connection_optional"`
+	IsConnectionOptional string                            `yaml:"is_connection_optional"`
 	Output               *Output
 }
 
