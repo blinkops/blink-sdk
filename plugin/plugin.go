@@ -34,7 +34,7 @@ type Action struct {
 	EntryPoint           string                            `yaml:"entry_point"`
 	Parameters           map[string]ActionParameter        `yaml:"parameters"`
 	Connections          map[string]connections.Connection `yaml:"connection_types"`
-	IsConnectionRequired bool                              `yaml:"is_connection_required"`
+	IsConnectionOptional string                            `yaml:"is_connection_optional"`
 	Output               *Output
 }
 
@@ -49,13 +49,14 @@ type Output struct {
 }
 
 type Description struct {
-	Name        string                            `yaml:"name"`
-	Description string                            `yaml:"description"`
-	Tags        []string                          `yaml:"tags"`
-	Provider    string                            `yaml:"provider"`
-	Connections map[string]connections.Connection `yaml:"connection_types"`
-	Version     string                            `yaml:"version"`
-	IconUri     string                            `yaml:"icon_uri"`
+	Name                 string                            `yaml:"name"`
+	Description          string                            `yaml:"description"`
+	Tags                 []string                          `yaml:"tags"`
+	Provider             string                            `yaml:"provider"`
+	Connections          map[string]connections.Connection `yaml:"connection_types"`
+	Version              string                            `yaml:"version"`
+	IconUri              string                            `yaml:"icon_uri"`
+	IsConnectionOptional bool                              `yaml:"is_connection_optional"`
 }
 
 type ExecuteActionRequest struct {

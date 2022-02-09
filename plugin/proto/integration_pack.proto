@@ -34,6 +34,7 @@ message PluginDescription {
 
   PluginType plugin_type = 9;
   string icon_uri = 10;
+  bool is_connection_optional = 11;
 }
 
 message ActionParameter {
@@ -60,7 +61,7 @@ message Action {
   string icon_uri = 7;
   string collection_name = 8;
   map<string, Connection> connections = 9;
-  bool is_connection_required = 10;
+  string is_connection_optional = 11;
 }
 
 message ActionList {
