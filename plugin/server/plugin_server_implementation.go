@@ -110,6 +110,7 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 			protoParameter := &pb.ActionParameter{
 				Field: &pb.FormField{
 					Name:        name,
+					DisplayName: parameter.DisplayName,
 					Type:        parameter.Type,
 					Description: parameter.Description,
 					Placeholder: parameter.Placeholder,
