@@ -12,6 +12,7 @@ import (
 const DefaultTimeout = time.Second
 
 type ActionParameter struct {
+	DisplayName string   `yaml:"display_name"`
 	Type        string   `yaml:"type"`
 	Description string   `yaml:"description"`
 	Placeholder string   `yaml:"placeholder"`
