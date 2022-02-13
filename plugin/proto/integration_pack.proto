@@ -116,6 +116,7 @@ message FormField {
   int64 index = 10;
   string format = 11;
   bool is_multi = 12;
+  string display_name = 13;
 }
 
 message ConnectionInstance {
