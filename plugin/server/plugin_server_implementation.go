@@ -2,15 +2,11 @@ package server
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	"time"
+
 	"github.com/blinkops/blink-sdk/plugin"
-	"github.com/blinkops/blink-sdk/plugin/config"
-	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc/metadata"
-	"time"
 )
 
 type PluginGRPCService struct {
@@ -18,54 +14,6 @@ type PluginGRPCService struct {
 
 	plugin  plugin.Implementation
 	lastUse int64
-}
-
-func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
-
-	protoConnections := map[string]*pb.Connection{}
-	for connectionName, connection := range connections {
-
-		protoConnectionFields := map[string]*pb.ConnectionField{}
-		for fieldName, field := range connection.Fields {
-			protoConnectionFields[fieldName] = &pb.ConnectionField{
-				Field: &pb.FormField{
-					Name:        field.Name,
-					Type:        field.FieldType,
-					InputType:   field.InputType,
-					Required:    field.Required,
-					Description: field.Description,
-					Placeholder: field.Placeholder,
-					Default:     field.Default,
-					Pattern:     field.Pattern,
-					Options:     field.Options,
-				},
-			}
-		}
-
-		protoConnections[connectionName] = &pb.Connection{
-			Name:      connectionName,
-			Fields:    protoConnectionFields,
-			Reference: connection.Reference,
-		}
-	}
-
-	return protoConnections
-}
-
-func translatePluginType() pb.PluginDescription_PluginType {
-	if config.GetConfig() == nil {
-		return pb.PluginDescription_SHARED
-	}
-	pluginType := config.GetConfig().Plugin.Type
-
-	switch pluginType {
-	case config.SharedPluginType:
-		return pb.PluginDescription_SHARED
-	case config.PrivatePluginType:
-		return pb.PluginDescription_PRIVATE
-	}
-
-	panic(fmt.Sprintf("Invalid plugin type configured %s", pluginType))
 }
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
@@ -144,43 +92,6 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 	}
 
 	return &pb.ActionList{Actions: protoActions}, nil
-}
-
-func translateActionContext(ctx context.Context, request *pb.ExecuteActionRequest) (map[string]interface{}, error) {
-
-	rawContext := map[string]interface{}{}
-	if len(request.Context) > 0 {
-		err := json.Unmarshal(request.Context, &rawContext)
-		if err != nil {
-			log.Error("Failed to unmarshal action context with error: ", err)
-			return nil, err
-		}
-	}
-
-	md, ok := metadata.FromIncomingContext(ctx)
-
-	if ok {
-		// remove unnecessary headers from the metadata and store it on the raw context.
-		delete(md, "user-agent")
-		delete(md, "content-type")
-		delete(md, ":authority")
-	}
-
-	return rawContext, nil
-}
-
-func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInstance) (map[string]*connections.ConnectionInstance, error) {
-
-	concreteConnections := map[string]*connections.ConnectionInstance{}
-	for protoName, protoConnection := range protoConnections {
-		concreteConnections[protoName] = &connections.ConnectionInstance{
-			Name: protoConnection.Name,
-			Id:   protoConnection.Id,
-			Data: protoConnection.Data,
-		}
-	}
-
-	return concreteConnections, nil
 }
 
 func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) {
@@ -265,9 +176,14 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 }
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
-	return &pb.HealthStatus{
+	status := &pb.HealthStatus{
 		LastUse: service.lastUse,
-	}, nil
+	}
+
+	if response, err := service.plugin.HealthProbe(); err == nil && response.Override {
+		status.LastUse = response.LastUse
+	}
+	return status, nil
 }
 
 func (service *PluginGRPCService) updateLastUse() {
