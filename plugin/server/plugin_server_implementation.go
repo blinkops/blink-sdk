@@ -2,70 +2,23 @@ package server
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	"sync"
+	"time"
+
 	"github.com/blinkops/blink-sdk/plugin"
-	"github.com/blinkops/blink-sdk/plugin/config"
-	"github.com/blinkops/blink-sdk/plugin/connections"
 	pb "github.com/blinkops/blink-sdk/plugin/proto"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc/metadata"
-	"time"
 )
 
 type PluginGRPCService struct {
 	pb.UnimplementedPluginServer
 
-	plugin  plugin.Implementation
+	plugin plugin.Implementation
+
+	activeWorkers      int64
+	activeWorkersMutex sync.Mutex
+
 	lastUse int64
-}
-
-func translateToProtoConnections(connections map[string]connections.Connection) map[string]*pb.Connection {
-
-	protoConnections := map[string]*pb.Connection{}
-	for connectionName, connection := range connections {
-
-		protoConnectionFields := map[string]*pb.ConnectionField{}
-		for fieldName, field := range connection.Fields {
-			protoConnectionFields[fieldName] = &pb.ConnectionField{
-				Field: &pb.FormField{
-					Name:        field.Name,
-					Type:        field.FieldType,
-					InputType:   field.InputType,
-					Required:    field.Required,
-					Description: field.Description,
-					Placeholder: field.Placeholder,
-					Default:     field.Default,
-					Pattern:     field.Pattern,
-					Options:     field.Options,
-				},
-			}
-		}
-
-		protoConnections[connectionName] = &pb.Connection{
-			Name:      connectionName,
-			Fields:    protoConnectionFields,
-			Reference: connection.Reference,
-		}
-	}
-
-	return protoConnections
-}
-
-func translatePluginType() pb.PluginDescription_PluginType {
-	if config.GetConfig() == nil {
-		return pb.PluginDescription_SHARED
-	}
-	pluginType := config.GetConfig().Plugin.Type
-
-	switch pluginType {
-	case config.SharedPluginType:
-		return pb.PluginDescription_SHARED
-	case config.PrivatePluginType:
-		return pb.PluginDescription_PRIVATE
-	}
-
-	panic(fmt.Sprintf("Invalid plugin type configured %s", pluginType))
 }
 
 func (service *PluginGRPCService) Describe(ctx context.Context, empty *pb.Empty) (*pb.PluginDescription, error) {
@@ -146,43 +99,6 @@ func (service *PluginGRPCService) GetActions(_ context.Context, _ *pb.Empty) (*p
 	return &pb.ActionList{Actions: protoActions}, nil
 }
 
-func translateActionContext(ctx context.Context, request *pb.ExecuteActionRequest) (map[string]interface{}, error) {
-
-	rawContext := map[string]interface{}{}
-	if len(request.Context) > 0 {
-		err := json.Unmarshal(request.Context, &rawContext)
-		if err != nil {
-			log.Error("Failed to unmarshal action context with error: ", err)
-			return nil, err
-		}
-	}
-
-	md, ok := metadata.FromIncomingContext(ctx)
-
-	if ok {
-		// remove unnecessary headers from the metadata and store it on the raw context.
-		delete(md, "user-agent")
-		delete(md, "content-type")
-		delete(md, ":authority")
-	}
-
-	return rawContext, nil
-}
-
-func translateConnectionInstances(protoConnections map[string]*pb.ConnectionInstance) (map[string]*connections.ConnectionInstance, error) {
-
-	concreteConnections := map[string]*connections.ConnectionInstance{}
-	for protoName, protoConnection := range protoConnections {
-		concreteConnections[protoName] = &connections.ConnectionInstance{
-			Name: protoConnection.Name,
-			Id:   protoConnection.Id,
-			Data: protoConnection.Data,
-		}
-	}
-
-	return concreteConnections, nil
-}
-
 func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) {
 	if request.Parameters == nil {
 		request.Parameters = map[string]string{}
@@ -194,8 +110,8 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 }
 
 func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
-	service.updateLastUse()
-	defer service.updateLastUse()
+	service.activateWorker()
+	defer service.deactivateWorker()
 
 	emplaceDefaultExecuteActionRequestValues(request)
 
@@ -243,8 +159,8 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 }
 
 func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
-	service.updateLastUse()
-	defer service.updateLastUse()
+	service.activateWorker()
+	defer service.deactivateWorker()
 
 	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
 	if err != nil {
@@ -265,22 +181,43 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 }
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
-	return &pb.HealthStatus{
-		LastUse: service.lastUse,
-	}, nil
+	status := &pb.HealthStatus{
+		LastUse: service.getLastUse(),
+	}
+	return status, nil
 }
 
-func (service *PluginGRPCService) updateLastUse() {
-	currentTime := timeNowNano()
-	if currentTime > service.lastUse {
-		service.lastUse = currentTime
+func (service *PluginGRPCService) getLastUse() int64 {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+
+	if service.activeWorkers > 0 {
+		return timeNowNano()
 	}
+	return service.lastUse
+}
+
+func (service *PluginGRPCService) activateWorker() {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+	service.activeWorkers++
+
+	service.lastUse = timeNowNano() // Update last use on worker activation
+}
+
+func (service *PluginGRPCService) deactivateWorker() {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+	service.activeWorkers--
+
+	service.lastUse = timeNowNano() // Update last use on worker de-activation
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
 	return &PluginGRPCService{
-		plugin:  plugin,
-		lastUse: timeNowNano(),
+		plugin:             plugin,
+		lastUse:            timeNowNano(),
+		activeWorkersMutex: sync.Mutex{},
 	}
 }
 

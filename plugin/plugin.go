@@ -1,11 +1,11 @@
 package plugin
 
 import (
+	"encoding/json"
 	"errors"
-	"github.com/blinkops/blink-sdk/plugin/connections"
 	"time"
 
-	"encoding/json"
+	"github.com/blinkops/blink-sdk/plugin/connections"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -92,8 +92,7 @@ type Implementation interface {
 }
 
 func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
-	_, ok := req.Parameters["parameters_as_json"]
-	if ok {
+	if _, ok := req.Parameters["parameters_as_json"]; ok {
 		return nil, errors.New(ErrParametersAsJsonProvided)
 	}
 	return req.Parameters, nil
@@ -106,8 +105,7 @@ func (req *ExecuteActionRequest) GetUnmarshalledParameters() (map[string]interfa
 	}
 
 	actionParameters := make(map[string]interface{})
-	err := json.Unmarshal([]byte(parametersAsJson), &actionParameters)
-	if err != nil {
+	if err := json.Unmarshal([]byte(parametersAsJson), &actionParameters); err != nil {
 		log.Error("Failed to unmarshal action parameters, err: ", err)
 		return nil, err
 	}
