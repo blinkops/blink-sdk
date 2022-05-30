@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/blinkops/blink-sdk/plugin"
@@ -12,7 +13,11 @@ import (
 type PluginGRPCService struct {
 	pb.UnimplementedPluginServer
 
-	plugin  plugin.Implementation
+	plugin plugin.Implementation
+
+	activeWorkers      int64
+	activeWorkersMutex sync.Mutex
+
 	lastUse int64
 }
 
@@ -105,8 +110,8 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 }
 
 func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
-	service.updateLastUse()
-	defer service.updateLastUse()
+	service.activateWorker()
+	defer service.deactivateWorker()
 
 	emplaceDefaultExecuteActionRequestValues(request)
 
@@ -154,8 +159,8 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 }
 
 func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
-	service.updateLastUse()
-	defer service.updateLastUse()
+	service.activateWorker()
+	defer service.deactivateWorker()
 
 	connectionsToBeValidated, err := translateConnectionInstances(request.Connections)
 	if err != nil {
@@ -177,26 +182,42 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
 	status := &pb.HealthStatus{
-		LastUse: service.lastUse,
-	}
-
-	if response, err := service.plugin.HealthProbe(); err == nil && response.Override {
-		status.LastUse = response.LastUse
+		LastUse: service.getLastUse(),
 	}
 	return status, nil
 }
 
-func (service *PluginGRPCService) updateLastUse() {
-	currentTime := timeNowNano()
-	if currentTime > service.lastUse {
-		service.lastUse = currentTime
+func (service *PluginGRPCService) getLastUse() int64 {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+
+	if service.activeWorkers > 0 {
+		return timeNowNano()
 	}
+	return service.lastUse
+}
+
+func (service *PluginGRPCService) activateWorker() {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+	service.activeWorkers++
+
+	service.lastUse = timeNowNano() // Update last use on worker activation
+}
+
+func (service *PluginGRPCService) deactivateWorker() {
+	service.activeWorkersMutex.Lock()
+	defer service.activeWorkersMutex.Unlock()
+	service.activeWorkers--
+
+	service.lastUse = timeNowNano() // Update last use on worker de-activation
 }
 
 func NewPluginServiceImplementation(plugin plugin.Implementation) *PluginGRPCService {
 	return &PluginGRPCService{
-		plugin:  plugin,
-		lastUse: timeNowNano(),
+		plugin:             plugin,
+		lastUse:            timeNowNano(),
+		activeWorkersMutex: sync.Mutex{},
 	}
 }
 
