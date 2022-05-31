@@ -83,8 +83,7 @@ type CredentialsValidationResponse struct {
 }
 
 type HealthStatusResponse struct {
-	LastUse  int64
-	Override bool
+	InUse bool
 }
 
 type Implementation interface {

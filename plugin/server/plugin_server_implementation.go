@@ -181,15 +181,9 @@ func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb
 }
 
 func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.HealthStatus, error) {
-	status := &pb.HealthStatus{
+	return &pb.HealthStatus{
 		LastUse: service.getLastUse(),
-	}
-
-	if pluginStatus, err := service.plugin.HealthStatus(); err == nil && pluginStatus.Override {
-		status.LastUse = pluginStatus.LastUse
-	}
-
-	return status, nil
+	}, nil
 }
 
 func (service *PluginGRPCService) getLastUse() int64 {
@@ -199,6 +193,11 @@ func (service *PluginGRPCService) getLastUse() int64 {
 	if service.activeWorkers > 0 {
 		return timeNowNano()
 	}
+
+	if pluginStatus, err := service.plugin.HealthStatus(); err == nil && pluginStatus.InUse {
+		return timeNowNano()
+	}
+
 	return service.lastUse
 }
 
