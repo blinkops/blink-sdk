@@ -184,6 +184,11 @@ func (service *PluginGRPCService) HealthProbe(context.Context, *pb.Empty) (*pb.H
 	status := &pb.HealthStatus{
 		LastUse: service.getLastUse(),
 	}
+
+	if pluginStatus, err := service.plugin.HealthStatus(); err == nil && pluginStatus.Override {
+		status.LastUse = pluginStatus.LastUse
+	}
+
 	return status, nil
 }
 

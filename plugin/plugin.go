@@ -82,6 +82,11 @@ type CredentialsValidationResponse struct {
 	RawValidationResponse []byte
 }
 
+type HealthStatusResponse struct {
+	LastUse  int64
+	Override bool
+}
+
 type Implementation interface {
 	Describe() Description
 
@@ -89,6 +94,7 @@ type Implementation interface {
 	ExecuteAction(context *ActionContext, request *ExecuteActionRequest) (*ExecuteActionResponse, error)
 
 	TestCredentials(map[string]*connections.ConnectionInstance) (*CredentialsValidationResponse, error)
+	HealthStatus() (*HealthStatusResponse, error)
 }
 
 func (req *ExecuteActionRequest) GetParameters() (map[string]string, error) {
