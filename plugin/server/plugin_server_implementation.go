@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -110,6 +111,12 @@ func emplaceDefaultExecuteActionRequestValues(request *pb.ExecuteActionRequest) 
 }
 
 func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb.ExecuteActionRequest) (*pb.ExecuteActionResponse, error) {
+	defer func() {
+		if recoveryInformation := recover(); recoveryInformation != nil {
+			log.Errorf("[PANIC RECOVERY] Successfully recovered from panic inside ExecuteAction, Information: \"%v\", Trace: \"%s\"", recoveryInformation, string(debug.Stack()))
+		}
+	}()
+
 	service.activateWorker()
 	defer service.deactivateWorker()
 
@@ -159,6 +166,12 @@ func (service *PluginGRPCService) ExecuteAction(ctx context.Context, request *pb
 }
 
 func (service *PluginGRPCService) TestCredentials(_ context.Context, request *pb.TestCredentialsRequest) (*pb.TestCredentialsResponse, error) {
+	defer func() {
+		if recoveryInformation := recover(); recoveryInformation != nil {
+			log.Errorf("[PANIC RECOVERY] Successfully recovered from panic inside TestCredentials, Information: \"%v\", Trace: \"%s\"", recoveryInformation, string(debug.Stack()))
+		}
+	}()
+
 	service.activateWorker()
 	defer service.deactivateWorker()
 
